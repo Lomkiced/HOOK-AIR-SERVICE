@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { Shield, Snowflake, ArrowLeft, Lock } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Lock } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function StaffLoginPage() {
@@ -51,13 +52,20 @@ export default function StaffLoginPage() {
       {/* Staff Login Card */}
       <main className="max-w-md w-full mx-auto bg-white rounded-2xl border-2 border-[#0284C7] shadow-lg overflow-hidden my-8">
         <div className="bg-[#0369A1] text-white p-6">
-          <div className="w-10 h-10 rounded-xl bg-[#075985] flex items-center justify-center mb-3">
-            <Shield className="w-5 h-5 text-[#FACC15]" />
+          <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#FACC15] bg-[#0F172A] shadow-md mb-3 shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Hook Air Service (ฮูก แอร์เซอร์วิส) Official Logo"
+              width={48}
+              height={48}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <h1 className="text-xl font-extrabold">
             {language === "en"
-              ? "Aircon Service Pro — Staff Portal"
-              : "ระบบจัดการคิวช่าง — Aircon Service Pro"}
+              ? "Hook Air Service — Staff Portal"
+              : "ระบบจัดการคิวช่าง — ฮูก แอร์เซอร์วิส"}
           </h1>
           <p className="text-xs text-[#E0F2FE] mt-1">
             {language === "en"
@@ -111,9 +119,15 @@ export default function StaffLoginPage() {
       </main>
 
       <footer className="text-center text-xs text-[#475569]">
-        <span className="inline-flex items-center gap-1.5 font-semibold">
-          <Snowflake className="w-3.5 h-3.5 text-[#0284C7]" />
-          Aircon Service Pro Security Gateway
+        <span className="inline-flex items-center gap-2 font-semibold">
+          <Image
+            src="/logo.png"
+            alt="Hook Air Service"
+            width={18}
+            height={18}
+            className="rounded-full inline-block"
+          />
+          Hook Air Service Security Gateway
         </span>
       </footer>
     </div>

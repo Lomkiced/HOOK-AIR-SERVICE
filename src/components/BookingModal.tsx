@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -154,18 +155,29 @@ function BookingModalDialog({
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className="relative z-10 w-full max-w-2xl rounded-2xl bg-white border-2 border-[#0284C7] shadow-2xl overflow-hidden my-auto"
           >
-            {/* Modal Top Header */}
+            {/* Modal Top Header with Official Logo */}
             <div className="bg-[#0369A1] text-white px-5 py-4 sm:px-7 sm:py-5 flex items-start justify-between gap-4">
-              <div>
-                <h2
-                  id="booking-modal-title"
-                  className="text-xl sm:text-2xl font-extrabold tracking-tight"
-                >
-                  {t.modal.title}
-                </h2>
-                <p className="mt-1 text-xs sm:text-sm text-[#E0F2FE]">
-                  {t.modal.subtitle}
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-[#FACC15] shrink-0 bg-[#0F172A] shadow-md">
+                  <Image
+                    src="/logo.png"
+                    alt="Hook Air Service Official Logo"
+                    width={44}
+                    height={44}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h2
+                    id="booking-modal-title"
+                    className="text-xl sm:text-2xl font-extrabold tracking-tight"
+                  >
+                    {t.modal.title}
+                  </h2>
+                  <p className="mt-0.5 text-xs sm:text-sm text-[#E0F2FE]">
+                    {t.modal.subtitle}
+                  </p>
+                </div>
               </div>
               <button
                 type="button"

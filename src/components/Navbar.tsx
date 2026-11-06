@@ -2,13 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import {
-  Snowflake,
-  Shield,
-  Menu,
-  X,
-  CalendarCheck,
-} from "lucide-react";
+import Image from "next/image";
+import { Shield, Menu, X, CalendarCheck } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface NavbarProps {
@@ -20,54 +15,57 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-[#BAE6FD]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-        {/* Brand Logo */}
-        <a
-          href="#"
-          className="flex items-center gap-3 group focus:outline-none"
-        >
-          <div className="w-10 h-10 rounded-xl bg-[#0284C7] group-hover:bg-[#0369A1] text-white flex items-center justify-center shadow-xs transition-colors shrink-0">
-            <Snowflake className="w-5 h-5 text-[#FACC15]" />
+    <header className="sticky top-0 z-40 w-full h-16 bg-white/85 backdrop-blur-md border-b border-[#BAE6FD]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        {/* Official Brand Logo */}
+        <a href="#" className="flex items-center gap-2.5 group focus:outline-none">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#FACC15] shadow-xs shrink-0 group-hover:scale-105 transition-transform bg-[#0F172A]">
+            <Image
+              src="/logo.png"
+              alt="Hook Air Service (ฮูก แอร์เซอร์วิส) Official Logo"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <div>
-            <span className="block font-extrabold text-base sm:text-lg tracking-tight text-[#0F172A] leading-none">
+            <span className="block font-extrabold text-sm sm:text-base tracking-tight text-[#0F172A] leading-none">
               {t.nav.brandName}
             </span>
-            <span className="block text-[11px] font-semibold text-[#0369A1] mt-0.5">
+            <span className="block text-[10px] font-semibold text-[#0369A1] mt-0.5">
               {t.nav.brandTagline}
             </span>
           </div>
         </a>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Minimal Links */}
         <nav
           aria-label="Primary Navigation"
-          className="hidden lg:flex items-center gap-7"
+          className="hidden lg:flex items-center gap-8"
         >
           <a
+            href="#brands"
+            className="text-xs font-extrabold tracking-tight text-[#334155] hover:text-[#0284C7] transition-colors"
+          >
+            {t.nav.brands}
+          </a>
+          <a
             href="#comparison"
-            className="text-sm font-bold text-[#334155] hover:text-[#0284C7] transition-colors"
+            className="text-xs font-extrabold tracking-tight text-[#334155] hover:text-[#0284C7] transition-colors"
           >
             {t.nav.comparison}
           </a>
           <a
             href="#property-types"
-            className="text-sm font-bold text-[#334155] hover:text-[#0284C7] transition-colors"
+            className="text-xs font-extrabold tracking-tight text-[#334155] hover:text-[#0284C7] transition-colors"
           >
             {t.nav.propertyTypes}
           </a>
-          <a
-            href="#service-areas"
-            className="text-sm font-bold text-[#334155] hover:text-[#0284C7] transition-colors"
-          >
-            {t.nav.serviceAreas}
-          </a>
         </nav>
 
-        {/* Right Controls: Pill Language Switcher, Book CTA, Subtle Staff Portal */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Sleek Pill-Shaped Language Switcher (🇬🇧 EN | 🇹🇭 TH) */}
+        {/* Right Controls: Pill Language Switcher (🇬🇧 EN | 🇹🇭 TH), Book Now CTA, Staff Portal */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <div
             role="group"
             aria-label={t.nav.langSwitchLabel}
@@ -79,7 +77,7 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
               aria-pressed={language === "en"}
               className={`px-2.5 py-1 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
                 language === "en"
-                  ? "bg-[#FACC15] text-[#0F172A] shadow-2xs"
+                  ? "bg-[#FACC15] text-[#0F172A]"
                   : "text-[#0369A1] hover:text-[#0F172A]"
               }`}
             >
@@ -91,7 +89,7 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
               aria-pressed={language === "th"}
               className={`px-2.5 py-1 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
                 language === "th"
-                  ? "bg-[#FACC15] text-[#0F172A] shadow-2xs"
+                  ? "bg-[#FACC15] text-[#0F172A]"
                   : "text-[#0369A1] hover:text-[#0F172A]"
               }`}
             >
@@ -99,26 +97,23 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
             </button>
           </div>
 
-          {/* Primary Action Yellow CTA */}
           <button
             type="button"
             onClick={onOpenBooking}
-            className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-xs shadow-2xs transition-colors cursor-pointer"
           >
-            <CalendarCheck className="w-4 h-4" />
+            <CalendarCheck className="w-3.5 h-3.5" />
             <span>{t.nav.bookCleaning}</span>
           </button>
 
-          {/* Subtle Staff Portal (/login) Link */}
           <Link
             href="/login"
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-[#475569] hover:text-[#0369A1] hover:bg-[#F8FAFC] border border-transparent hover:border-[#BAE6FD] transition-colors"
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-[#475569] hover:text-[#0369A1] hover:bg-[#F8FAFC] transition-colors"
           >
             <Shield className="w-3.5 h-3.5 text-[#0284C7]" />
             <span>{t.nav.staffPortal}</span>
           </Link>
 
-          {/* Mobile Hamburger Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
@@ -126,19 +121,22 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
             aria-label="Toggle navigation menu"
             className="lg:hidden p-2 rounded-xl border border-[#BAE6FD] text-[#0F172A] hover:bg-[#E0F2FE] transition-colors cursor-pointer"
           >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown Drawer */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-[#BAE6FD] px-4 pt-3 pb-5 space-y-3">
           <div className="flex flex-col space-y-1">
+            <a
+              href="#brands"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2.5 rounded-xl text-sm font-bold text-[#0F172A] hover:bg-[#E0F2FE]/60"
+            >
+              {t.nav.brands}
+            </a>
             <a
               href="#comparison"
               onClick={() => setMobileMenuOpen(false)}
@@ -152,13 +150,6 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
               className="px-3 py-2.5 rounded-xl text-sm font-bold text-[#0F172A] hover:bg-[#E0F2FE]/60"
             >
               {t.nav.propertyTypes}
-            </a>
-            <a
-              href="#service-areas"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 rounded-xl text-sm font-bold text-[#0F172A] hover:bg-[#E0F2FE]/60"
-            >
-              {t.nav.serviceAreas}
             </a>
           </div>
 
@@ -188,4 +179,3 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
     </header>
   );
 }
-

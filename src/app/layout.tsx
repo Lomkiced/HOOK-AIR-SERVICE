@@ -25,9 +25,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aircon Service Pro | Hospital-Grade Condo & Home Aircon Cleaning in Thailand",
+  title: "Hook Air Service (ฮูก แอร์เซอร์วิส) | Hospital-Grade Condo & Home Aircon Cleaning",
   description:
     "Professional high-pressure air-conditioning deep cleaning and anti-bacterial sanitization for Bangkok condominiums and houses. 30-day water leak warranty.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
