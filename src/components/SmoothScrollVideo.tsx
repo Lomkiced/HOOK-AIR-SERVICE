@@ -33,7 +33,7 @@ export interface SmoothScrollVideoProps {
 
 /**
  * High-performance 60FPS Scroll-Scrubbed Video Engine:
- * 1. Fetches the MP4 once into an in-memory Blob (URL.createObjectURL) to eliminate disk/HTTP Range latency.
+ * 1. Immediately primes frame 0 and fetches the MP4 into an in-memory Blob (URL.createObjectURL) to eliminate disk/HTTP Range latency.
  * 2. Runs a single decoupled requestAnimationFrame loop (zero React useState on scroll).
  * 3. Smoothly interpolates video.currentTime using Lerp (0.18) guarded by !video.seeking.
  * 4. Composites decoded frames onto an HTML5 <canvas> with object-cover geometry and will-change: transform.
@@ -137,7 +137,7 @@ export function SmoothScrollVideo({
     let rafId = 0;
     let smoothedProgress = Math.max(0, Math.min(1, scrollYProgress.get()));
     let smoothedTime = 0;
-    let ContinuousFallbackProgress = 0;
+    let continuousFallbackProgress = 0;
 
     const canvas = canvasRef.current;
     const ctx = canvas ? canvas.getContext("2d", { alpha: false }) : null;
@@ -203,8 +203,8 @@ export function SmoothScrollVideo({
         if (hasValidVideo && vid) {
           displayProgress = vid.currentTime / vid.duration;
         } else {
-          ContinuousFallbackProgress = (ContinuousFallbackProgress + 0.0022) % 1;
-          displayProgress = ContinuousFallbackProgress;
+          continuousFallbackProgress = (continuousFallbackProgress + 0.0022) % 1;
+          displayProgress = continuousFallbackProgress;
         }
       }
 
@@ -252,9 +252,14 @@ export function SmoothScrollVideo({
           const rect = canvas.getBoundingClientRect();
           drawVideoCover(ctx, vid, rect.width, rect.height);
         }
-      } else if (canvas && ctx && renderFallbackRef.current) {
+      } else if (canvas && ctx) {
         const rect = canvas.getBoundingClientRect();
-        renderFallbackRef.current(ctx, rect.width, rect.height, displayProgress);
+        if (renderFallbackRef.current) {
+          renderFallbackRef.current(ctx, rect.width, rect.height, displayProgress);
+        } else {
+          ctx.fillStyle = "#0F172A";
+          ctx.fillRect(0, 0, rect.width, rect.height);
+        }
       }
 
       rafId = window.requestAnimationFrame(tick);
@@ -312,4 +317,3 @@ export function SmoothScrollVideo({
     </div>
   );
 }
-
