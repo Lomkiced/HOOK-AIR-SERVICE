@@ -12,10 +12,13 @@ interface ExplodedAirconHeroProps {
 }
 
 const HERO_VIDEO_SOURCES = [
-  "/videos/hero-aircon-scrub.mp4",
   "/videos/hero-aircon-assembly.mp4",
-  "/ACBG2.mp4",
 ];
+
+const HERO_FRAME_SEQUENCE = {
+  folder: "/videos/hero-frames",
+  count: 239,
+} as const;
 
 const HERO_WORDS = {
   en: ["Exposed.", "150 PSI.", "Aligned.", "Pure Air."],
@@ -26,7 +29,6 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
   const { language } = useLanguage();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const progressFillRef = useRef<HTMLDivElement | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -78,13 +80,12 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
     >
       {/* Full-Viewport Sticky Stage (100% Edge-to-Edge Behind Transparent Navbar) */}
       <div className="sticky top-0 h-screen sm:h-dvh w-full overflow-hidden flex flex-col justify-end items-center pb-14 sm:pb-20 px-4">
-        {/* 1. 100% Full-Bleed Scroll-Scrubbed Video (Zero Blinking, Persistent Canvas Buffer) */}
+        {/* 1. Full 24FPS Native RAM Frame-Sequence Scrubber (Zero Blur, Zero Indicators) */}
         <SmoothScrollVideo
           sources={HERO_VIDEO_SOURCES}
+          frameSequence={HERO_FRAME_SEQUENCE}
           scrollYProgress={scrollYProgress}
-          lerpFactor={0.18}
-          canvasFilter="contrast(1.05) saturate(1.04)"
-          progressFillRef={progressFillRef}
+          dampingLambda={18}
           className="pointer-events-none absolute inset-0 w-full h-full"
         />
 
@@ -132,18 +133,6 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
               {language === "en" ? "Book Now" : "จองคิวล้างแอร์"}
             </button>
           </motion.div>
-        </div>
-
-        {/* 3. Whisper-Quiet Bottom Edge Scroll Line Indicator */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-white/10"
-        >
-          <div
-            ref={progressFillRef}
-            className="h-full bg-[#FACC15]"
-            style={{ width: "0%" }}
-          />
         </div>
       </div>
     </section>

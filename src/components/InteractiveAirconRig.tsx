@@ -1,7 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, useMotionValueEvent, type MotionValue } from "framer-motion";
+import React from "react";
+import {
+  motion,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import type { BrandId, PanelStyle } from "@/lib/brands";
 import { BrandLogo } from "@/components/BrandLogos";
@@ -14,7 +18,7 @@ export interface InteractiveAirconRigProps {
   panel?: PanelStyle;
   louver?: string;
   /** Scroll-driven explode progress (0 = Assembled, 1 = Fully Scattered/Exploded) */
-  scrollExplodeProgress?: MotionValue<number>;
+  scrollExplodeProgress: MotionValue<number>;
 }
 
 function renderFasciaSurface(panel: PanelStyle = "smooth") {
@@ -112,286 +116,270 @@ export function InteractiveAirconRig({
 }: InteractiveAirconRigProps) {
   const { language } = useLanguage();
 
-  // Starts at 100% Assembled, then scatters to 0% Assembled (100% Exploded) as user scrolls into #brands
-  const [assemblyPct, setAssemblyPct] = useState<number>(100);
+  // Whole-rig perspective angle driven directly by scroll (0 = Assembled, 1 = Scattered)
+  const rigRotX = useTransform(scrollExplodeProgress, [0, 1], [0, 11]);
+  const rigRotY = useTransform(scrollExplodeProgress, [0, 1], [0, -12]);
 
-  useMotionValueEvent(
-    scrollExplodeProgress ?? {
-      get: () => 0,
-      on: () => () => {},
-    } as unknown as MotionValue<number>,
-    "change",
-    (latestExplode) => {
-      if (!scrollExplodeProgress) return;
-      const clampedExplode = Math.max(0, Math.min(1, latestExplode));
-      const nextAssemblyPct = Math.round((1 - clampedExplode) * 100);
-      setAssemblyPct(nextAssemblyPct);
-    }
-  );
+  // Layer 1: Front Aerodynamic Fascia
+  const l1Y = useTransform(scrollExplodeProgress, [0, 1], [0, -138]);
+  const l1Z = useTransform(scrollExplodeProgress, [0, 1], [0, 110]);
+  const l1RotX = useTransform(scrollExplodeProgress, [0, 1], [0, 8]);
 
-  // Convert 0..100 into explosion spread factor (1.0 when scattered/exploded, 0.0 when assembled)
-  const spread = (100 - assemblyPct) / 100;
-  const isExploded = assemblyPct < 50;
+  // Layer 2: Dual Honeycomb Pre-Filters
+  const l2Y = useTransform(scrollExplodeProgress, [0, 1], [0, -68]);
+  const l2Z = useTransform(scrollExplodeProgress, [0, 1], [0, 55]);
+  const l2RotX = useTransform(scrollExplodeProgress, [0, 1], [0, 12]);
+
+  // Layer 4: Cross-Flow Cylindrical Blower Wheel
+  const l4Y = useTransform(scrollExplodeProgress, [0, 1], [0, 68]);
+  const l4Z = useTransform(scrollExplodeProgress, [0, 1], [0, -55]);
+
+  // Layer 5: Rear Structural Chassis & Condensate Drain Pan
+  const l5Y = useTransform(scrollExplodeProgress, [0, 1], [0, 138]);
+  const l5Z = useTransform(scrollExplodeProgress, [0, 1], [0, -110]);
+  const l5RotX = useTransform(scrollExplodeProgress, [0, 1], [0, -8]);
+
+  // Floating part detail callouts opacity & X offset (appear smoothly as layers separate)
+  const calloutOpacity = useTransform(scrollExplodeProgress, [0.18, 0.55], [0, 1]);
+  const calloutLeftX = useTransform(scrollExplodeProgress, [0.18, 0.55], [14, 0]);
+  const calloutRightX = useTransform(scrollExplodeProgress, [0.18, 0.55], [-14, 0]);
 
   return (
-    <div className="rounded-3xl bg-[#0F172A] text-white border-2 border-[#0284C7] shadow-2xl p-6 sm:p-8 flex flex-col justify-between">
-      {/* Top Studio Telemetry Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="bg-white rounded-xl px-3.5 py-1.5 h-9 flex items-center justify-center border border-[#BAE6FD]">
-            <BrandLogo brand={selectedBrandId} className="w-24 h-5" />
-          </div>
-          <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-[#E0F2FE]">
-            {selectedBrandName}
-          </span>
-        </div>
-
-        <span className="px-3 py-1 rounded-full bg-[#FACC15] text-[#0F172A] font-mono text-xs font-extrabold tabular-nums">
-          {psi} PSI PROTOCOL
-        </span>
-      </div>
-
-      {/* 3D Isometric 5-Layer Aircon Assembly Stage */}
+    <div
+      className="relative h-[500px] sm:h-[560px] w-full flex items-center justify-center select-none overflow-visible"
+      style={{ perspective: "1400px" }}
+    >
+      {/* Soft Ambient Cooling Aura in Open Space (No Card Box) */}
       <div
-        className="relative my-6 h-[320px] sm:h-[360px] w-full flex items-center justify-center overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_50%_50%,rgba(2,132,199,0.28)_0%,rgba(15,23,42,0.96)_76%)] border border-slate-800"
-        style={{ perspective: "1300px" }}
+        aria-hidden="true"
+        className="pointer-events-none absolute w-[380px] sm:w-[460px] h-[380px] sm:h-[460px] rounded-full bg-[radial-gradient(circle,rgba(2,132,199,0.16)_0%,rgba(186,230,253,0.08)_45%,transparent_72%)] blur-2xl"
+      />
+
+      {/* Free-Floating 3D 5-Layer Air-Conditioner Assembly */}
+      <motion.div
+        key={selectedBrandName}
+        initial={{ scale: 0.94, opacity: 0.75 }}
+        animate={{
+          scale: 1,
+          opacity: 1,
+          y: [0, -7, 0],
+        }}
+        transition={{
+          scale: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.3 },
+          y: { duration: 4.8, repeat: Infinity, ease: "easeInOut" },
+        }}
+        style={{
+          rotateX: rigRotX,
+          rotateY: rigRotY,
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+        }}
+        className="relative w-full max-w-[420px] h-[320px] flex items-center justify-center"
       >
-        {/* Subtle Architectural Grid */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-15 bg-[linear-gradient(to_right,#38BDF8_1px,transparent_1px),linear-gradient(to_bottom,#38BDF8_1px,transparent_1px)] bg-[size:40px_40px]"
-        />
-
-        {/* Auto-Floating 3D Rig Container */}
+        {/* ====================================================================
+            LAYER 5: REAR CHASSIS & DRAIN TROUGH + FLOATING DETAIL CALLOUT
+        ==================================================================== */}
         <motion.div
-          key={selectedBrandName}
-          initial={{ scale: 0.94, opacity: 0.7 }}
-          animate={{
-            scale: 1,
-            opacity: 1,
-            y: [0, -5, 0],
-            rotateX: 12 * spread,
-            rotateY: -13 * spread,
-          }}
-          transition={{
-            scale: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
-            opacity: { duration: 0.3 },
-            y: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
-            rotateX: { duration: 0.25 },
-            rotateY: { duration: 0.25 },
-          }}
-          style={{
-            transformStyle: "preserve-3d",
-            willChange: "transform",
-          }}
-          className="relative w-full max-w-[460px] h-[240px] flex items-center justify-center px-4"
+          style={{ y: l5Y, z: l5Z, rotateX: l5RotX, willChange: "transform" }}
+          className="absolute w-[84%] sm:w-[340px] h-[82px] rounded-2xl bg-[#0F172A] border-2 border-slate-600 shadow-2xl flex flex-col justify-between p-3"
         >
-          {/* LAYER 5: Rear Structural Chassis & Condensate Drain Trough */}
-          <motion.div
-            animate={{
-              y: 94 * spread,
-              z: -90 * spread,
-              rotateX: -8 * spread,
-            }}
-            transition={{ type: "spring", stiffness: 130, damping: 24 }}
-            className="absolute w-[88%] sm:w-[400px] h-[92px] rounded-2xl bg-[#0F172A] border border-slate-600/90 shadow-xl flex flex-col justify-between p-3"
-          >
-            <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
-              <span>05 / REAR CHASSIS & DRAIN PAN</span>
-              <span className="text-[#38BDF8]">SEALED DRAINAGE</span>
-            </div>
-            <div className="grid grid-cols-8 gap-1 my-auto">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-3 rounded-xs bg-slate-800 border border-slate-700"
-                />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* LAYER 4: Cross-Flow Cylindrical Squirrel-Cage Blower Wheel (โพรงกระรอก) */}
-          <motion.div
-            animate={{
-              y: 48 * spread,
-              z: -42 * spread,
-            }}
-            transition={{ type: "spring", stiffness: 130, damping: 24 }}
-            className="absolute w-[84%] sm:w-[380px] h-[68px] rounded-xl bg-slate-900/95 border border-[#38BDF8]/55 shadow-lg flex items-center justify-between px-3.5"
-          >
-            <span className="font-mono text-[10px] font-bold text-[#E0F2FE]">
-              04 / CROSS-FLOW TURBINE
-            </span>
-            <div className="flex-1 mx-3 h-7 rounded-full bg-gradient-to-r from-[#0369A1] via-[#0284C7] to-[#0369A1] border border-[#38BDF8]/60 flex items-center justify-evenly px-2 overflow-hidden">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-0.5 h-full bg-[#E0F2FE]/65 -skew-x-12"
-                />
-              ))}
-            </div>
-            <span className="font-mono text-[10px] font-bold text-[#FACC15]">
-              BALANCED
-            </span>
-          </motion.div>
-
-          {/* LAYER 3: Blue-Fin Evaporator Core + Copper U-Bends */}
-          <motion.div
-            animate={{
-              y: 0,
-              z: 0,
-              boxShadow:
-                spread > 0.3
-                  ? "0 0 32px rgba(2, 132, 199, 0.55)"
-                  : "0 0 12px rgba(2, 132, 199, 0.2)",
-            }}
-            transition={{ type: "spring", stiffness: 130, damping: 24 }}
-            className="absolute w-[90%] sm:w-[410px] h-[88px] rounded-2xl bg-[#0369A1] border-2 border-[#38BDF8] flex flex-col justify-between p-3 overflow-hidden"
-          >
-            <div className="relative z-10 flex items-center justify-between font-mono text-[10px] font-extrabold text-white">
-              <span>03 / BLUE-FIN EVAPORATOR CORE</span>
-              <span className="px-2 py-0.5 rounded bg-[#FACC15] text-[#0F172A]">
-                {psi} PSI FLUSH
-              </span>
-            </div>
-
-            <div className="relative z-10 grid grid-cols-20 gap-0.5 h-7 items-center">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-full bg-[#E0F2FE]/55 rounded-full"
-                />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* LAYER 2: Dual Honeycomb Pre-Filters */}
-          <motion.div
-            animate={{
-              y: -48 * spread,
-              z: 45 * spread,
-              rotateX: 14 * spread,
-            }}
-            transition={{ type: "spring", stiffness: 130, damping: 24 }}
-            className="absolute w-[88%] sm:w-[396px] h-[74px] rounded-xl bg-[#E0F2FE]/15 backdrop-blur-xs border border-[#BAE6FD]/80 grid grid-cols-2 gap-2.5 p-2.5"
-          >
-            {[0, 1].map((pane) => (
+          <div className="flex items-center justify-between font-mono text-[10px] text-slate-300">
+            <span>05 / REAR CHASSIS</span>
+            <span className="text-[#38BDF8]">DRAIN PAN</span>
+          </div>
+          <div className="grid grid-cols-8 gap-1 my-auto">
+            {Array.from({ length: 8 }).map((_, i) => (
               <div
-                key={pane}
-                className="rounded-lg border border-[#38BDF8]/70 bg-[#0284C7]/20 flex items-center justify-between px-2.5"
-              >
-                <span className="font-mono text-[9px] font-bold text-[#E0F2FE]">
-                  02 / FILTER PANE 0{pane + 1}
-                </span>
-                <span className="font-mono text-[9px] text-[#FACC15]">
-                  SANITIZED
-                </span>
-              </div>
+                key={i}
+                className="h-3 rounded-xs bg-slate-800 border border-slate-700"
+              />
             ))}
-          </motion.div>
+          </div>
 
-          {/* LAYER 1: Front Aerodynamic Fascia with Dynamic Brand Badge & 18°C LED */}
+          {/* Floating Callout Pill — Right */}
           <motion.div
-            animate={{
-              y: -96 * spread,
-              z: 95 * spread,
-              rotateX: 9 * spread,
-            }}
-            transition={{ type: "spring", stiffness: 130, damping: 24 }}
-            style={{ borderColor: selectedBrandColor }}
-            className="absolute w-[94%] sm:w-[428px] rounded-2xl bg-white text-[#0F172A] border-2 shadow-2xl p-3.5"
+            style={{ opacity: calloutOpacity, x: calloutRightX }}
+            className="hidden sm:flex items-center gap-2 absolute -right-44 top-1/2 -translate-y-1/2 pointer-events-none"
           >
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: selectedBrandColor }}
-                />
-                <span className="font-mono text-xs font-extrabold tracking-tight uppercase text-[#0F172A]">
-                  {selectedBrandName}
-                </span>
+            <span className="w-6 h-px bg-[#0284C7]" />
+            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-left">
+              <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
+                05 / DRAIN TROUGH
               </div>
-              <span className="px-2.5 py-0.5 rounded-md bg-[#0F172A] text-[#FACC15] font-mono text-xs font-extrabold tabular-nums">
-                18°C PURE
-              </span>
-            </div>
-
-            {/* Brand-Specific Fascia Texture */}
-            <div className="rounded-xl bg-[#F8FAFC] border border-[#BAE6FD] overflow-hidden">
-              {renderFasciaSurface(panel)}
-            </div>
-
-            <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between font-mono text-[10px] font-bold text-[#0369A1]">
-              <span>01 / FRONT FASCIA ({panel.toUpperCase()})</span>
-              <span>LOUVER: {louver.toUpperCase()}</span>
+              <div className="text-[11px] font-extrabold text-[#0F172A] whitespace-nowrap">
+                {language === "en" ? "Anti-Sludge Flush" : "ล้างถาดน้ำทิ้งไร้เมือก"}
+              </div>
             </div>
           </motion.div>
         </motion.div>
-      </div>
 
-      {/* Interactive Controls: Segmented Toggle + Smooth Slider */}
-      <div className="space-y-4 pt-2 border-t border-slate-800">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Apple-Style Segmented Mode Switch */}
-          <div className="inline-flex bg-slate-900 p-1 rounded-full border border-slate-700">
-            <button
-              type="button"
-              onClick={() => setAssemblyPct(0)}
-              className={`px-4 py-1.5 rounded-full text-xs font-extrabold transition-colors cursor-pointer ${
-                isExploded
-                  ? "bg-[#FACC15] text-[#0F172A]"
-                  : "text-slate-300 hover:text-white"
-              }`}
-            >
-              {language === "en" ? "Exploded View" : "ถอดชิ้นส่วน"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setAssemblyPct(100)}
-              className={`px-4 py-1.5 rounded-full text-xs font-extrabold transition-colors cursor-pointer ${
-                !isExploded
-                  ? "bg-[#FACC15] text-[#0F172A]"
-                  : "text-slate-300 hover:text-white"
-              }`}
-            >
-              {language === "en" ? "Assembled" : "ประกอบสมบูรณ์"}
-            </button>
-          </div>
-
-          <span className="font-mono text-xs font-extrabold text-[#FACC15] tabular-nums">
-            {100 - assemblyPct}%{" "}
-            {language === "en" ? "SCATTERED" : "ถอดแยกชิ้นส่วน"}
+        {/* ====================================================================
+            LAYER 4: CROSS-FLOW BLOWER WHEEL + FLOATING DETAIL CALLOUT
+        ==================================================================== */}
+        <motion.div
+          style={{ y: l4Y, z: l4Z, willChange: "transform" }}
+          className="absolute w-[80%] sm:w-[324px] h-[62px] rounded-xl bg-slate-900 border-2 border-[#38BDF8]/70 shadow-xl flex items-center justify-between px-3.5"
+        >
+          <span className="font-mono text-[10px] font-bold text-[#E0F2FE]">
+            04 / TURBINE
           </span>
-        </div>
+          <div className="flex-1 mx-3 h-6 rounded-full bg-gradient-to-r from-[#0369A1] via-[#0284C7] to-[#0369A1] border border-[#38BDF8]/70 flex items-center justify-evenly px-2 overflow-hidden">
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-0.5 h-full bg-[#E0F2FE]/70 -skew-x-12"
+              />
+            ))}
+          </div>
+          <span className="font-mono text-[10px] font-bold text-[#FACC15]">
+            RPM OK
+          </span>
 
-        {/* Continuous Interactive Range Scrubber */}
-        <div className="space-y-1.5">
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={assemblyPct}
-            onChange={(e) => setAssemblyPct(Number(e.target.value))}
-            aria-label={
-              language === "en"
-                ? "Interactive aircon assembly slider"
-                : "แถบเลื่อนถอดและประกอบชิ้นส่วนแอร์"
-            }
-            className="w-full h-2 rounded-lg appearance-none bg-slate-800 accent-[#FACC15] cursor-pointer"
-          />
-          <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
-            <span>
-              {language === "en" ? "0% EXPLODED LAYERS" : "0% ถอดแยก 5 ชั้น"}
-            </span>
-            <span>
-              {language === "en" ? "SCROLL OR DRAG" : "เลื่อนหน้าจอหรือลากแถบ"}
-            </span>
-            <span>
-              {language === "en" ? "100% FACTORY SEALED" : "100% ประกอบสมบูรณ์"}
+          {/* Floating Callout Pill — Left */}
+          <motion.div
+            style={{ opacity: calloutOpacity, x: calloutLeftX }}
+            className="hidden sm:flex items-center gap-2 absolute -left-48 top-1/2 -translate-y-1/2 pointer-events-none"
+          >
+            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-right">
+              <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
+                04 / BLOWER WHEEL
+              </div>
+              <div className="text-[11px] font-extrabold text-[#0F172A] whitespace-nowrap">
+                {language === "en" ? "Squirrel-Cage Strip" : "ถอดล้างพัดลมโพรงกระรอก"}
+              </div>
+            </div>
+            <span className="w-6 h-px bg-[#0284C7]" />
+          </motion.div>
+        </motion.div>
+
+        {/* ====================================================================
+            LAYER 3: BLUE-FIN EVAPORATOR COIL + FLOATING DETAIL CALLOUT
+        ==================================================================== */}
+        <motion.div
+          style={{ willChange: "transform" }}
+          className="absolute w-[86%] sm:w-[350px] h-[82px] rounded-2xl bg-[#0369A1] border-2 border-[#38BDF8] shadow-[0_12px_36px_rgba(2,132,199,0.35)] flex flex-col justify-between p-3"
+        >
+          <div className="relative z-10 flex items-center justify-between font-mono text-[10px] font-extrabold text-white">
+            <span>03 / EVAPORATOR CORE</span>
+            <span className="px-2 py-0.5 rounded bg-[#FACC15] text-[#0F172A]">
+              {psi} PSI
             </span>
           </div>
-        </div>
-      </div>
+
+          <div className="relative z-10 grid grid-cols-20 gap-0.5 h-6 items-center">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-full bg-[#E0F2FE]/60 rounded-full"
+              />
+            ))}
+          </div>
+
+          {/* Floating Callout Pill — Right */}
+          <motion.div
+            style={{ opacity: calloutOpacity, x: calloutRightX }}
+            className="hidden sm:flex items-center gap-2 absolute -right-48 top-1/2 -translate-y-1/2 pointer-events-none"
+          >
+            <span className="w-6 h-px bg-[#0284C7]" />
+            <div className="px-3 py-1.5 rounded-xl bg-[#0F172A] text-white border border-[#FACC15] shadow-lg text-left">
+              <div className="font-mono text-[9px] font-extrabold text-[#FACC15] uppercase">
+                03 / EVAPORATOR COIL
+              </div>
+              <div className="text-[11px] font-extrabold text-white whitespace-nowrap">
+                {psi} PSI {language === "en" ? "Hydro-Sanitize" : "ฉีดล้างคอยล์แรงดันสูง"}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* ====================================================================
+            LAYER 2: DUAL HONEYCOMB PRE-FILTERS + FLOATING DETAIL CALLOUT
+        ==================================================================== */}
+        <motion.div
+          style={{ y: l2Y, z: l2Z, rotateX: l2RotX, willChange: "transform" }}
+          className="absolute w-[84%] sm:w-[338px] h-[68px] rounded-xl bg-white/85 backdrop-blur-md border-2 border-[#0284C7]/60 shadow-lg grid grid-cols-2 gap-2 p-2"
+        >
+          {[0, 1].map((pane) => (
+            <div
+              key={pane}
+              className="rounded-lg border border-[#0284C7]/45 bg-[#E0F2FE]/65 flex items-center justify-between px-2.5"
+            >
+              <span className="font-mono text-[9px] font-extrabold text-[#0369A1]">
+                02 / FILTER 0{pane + 1}
+              </span>
+              <span className="font-mono text-[9px] font-extrabold text-[#0F172A]">
+                PURE
+              </span>
+            </div>
+          ))}
+
+          {/* Floating Callout Pill — Left */}
+          <motion.div
+            style={{ opacity: calloutOpacity, x: calloutLeftX }}
+            className="hidden sm:flex items-center gap-2 absolute -left-48 top-1/2 -translate-y-1/2 pointer-events-none"
+          >
+            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-right">
+              <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
+                02 / HONEYCOMB MESH
+              </div>
+              <div className="text-[11px] font-extrabold text-[#0F172A] whitespace-nowrap">
+                {language === "en" ? "PM2.5 Pre-Filter Wash" : "ฟอกแผ่นกรองฝุ่นละเอียด"}
+              </div>
+            </div>
+            <span className="w-6 h-px bg-[#0284C7]" />
+          </motion.div>
+        </motion.div>
+
+        {/* ====================================================================
+            LAYER 1: FRONT AERODYNAMIC FASCIA + FLOATING DETAIL CALLOUT
+        ==================================================================== */}
+        <motion.div
+          style={{
+            y: l1Y,
+            z: l1Z,
+            rotateX: l1RotX,
+            borderColor: selectedBrandColor,
+            willChange: "transform",
+          }}
+          className="absolute w-[90%] sm:w-[368px] rounded-2xl bg-white text-[#0F172A] border-2 shadow-[0_24px_60px_rgba(15,23,42,0.22)] p-3.5"
+        >
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <BrandLogo brand={selectedBrandId} className="w-20 h-4 object-contain" />
+            </div>
+            <span className="px-2 py-0.5 rounded-md bg-[#0F172A] text-[#FACC15] font-mono text-[11px] font-extrabold tabular-nums">
+              18°C
+            </span>
+          </div>
+
+          {/* Brand-Specific Fascia Texture */}
+          <div className="rounded-xl bg-[#F8FAFC] border border-[#BAE6FD] overflow-hidden">
+            {renderFasciaSurface(panel)}
+          </div>
+
+          <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between font-mono text-[9px] font-bold text-[#0369A1]">
+            <span>01 / {selectedBrandName.toUpperCase()} FASCIA</span>
+            <span>{louver.toUpperCase()}</span>
+          </div>
+
+          {/* Floating Callout Pill — Right */}
+          <motion.div
+            style={{ opacity: calloutOpacity, x: calloutRightX }}
+            className="hidden sm:flex items-center gap-2 absolute -right-44 top-1/2 -translate-y-1/2 pointer-events-none"
+          >
+            <span className="w-6 h-px bg-[#0284C7]" />
+            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-left">
+              <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
+                01 / FRONT FASCIA
+              </div>
+              <div className="text-[11px] font-extrabold text-[#0F172A] whitespace-nowrap">
+                {selectedBrandName} ({panel})
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
