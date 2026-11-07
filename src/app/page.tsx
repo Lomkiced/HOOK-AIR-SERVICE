@@ -6,7 +6,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { BrandId } from "@/lib/brands";
 import { Navbar } from "@/components/Navbar";
 import { ExplodedAirconHero } from "@/components/ExplodedAirconHero";
-import { FpovWalkthroughSection } from "@/components/FpovWalkthroughSection";
+import { AboutUsWalkthrough } from "@/components/AboutUsWalkthrough";
 import { BrandMasteryShowcase } from "@/components/BrandMasteryShowcase";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { PropertyTypeExplorer } from "@/components/PropertyTypeExplorer";
@@ -57,8 +57,8 @@ export default function HomePage() {
           onOpenBooking={() => openBookingModal("condo", 2, "sukhumvit", "instant")}
         />
 
-        {/* 2. #about — Scroll-Scrubbed FPOV On-Site Walkthrough & Engineering Story */}
-        <FpovWalkthroughSection />
+        {/* 2. #about — Scroll-Scrubbed FPOV On-Site Walkthrough, Origin Story & Founder's Message */}
+        <AboutUsWalkthrough />
 
         {/* 3. #services — 4-Discipline Service Matrix, Condo vs. House Protocol & Coil Comparison */}
         <PropertyTypeExplorer

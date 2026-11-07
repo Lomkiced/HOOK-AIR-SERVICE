@@ -14,9 +14,23 @@ export interface HeroMilestone {
 
 export interface FpovPillar {
   num: string;
+  subtitle: string;
   title: string;
   body: string;
   timecode: string;
+}
+
+export interface FounderMessage {
+  eyebrow: string;
+  quote: string;
+  author: string;
+  role: string;
+  signature: string;
+}
+
+export interface AboutMilestoneStat {
+  value: string;
+  label: string;
 }
 
 export interface ServicePillar {
@@ -85,7 +99,12 @@ export interface Translations {
     lead: string;
     videoCaption: string;
     videoSub: string;
+    playFullBtn: string;
+    scrubModeBtn: string;
+    stageLabels: [string, string, string];
     pillars: FpovPillar[];
+    founder: FounderMessage;
+    milestones: AboutMilestoneStat[];
     metrics: {
       units: { value: string; label: string };
       warranty: { value: string; label: string };
@@ -251,39 +270,61 @@ const translations: Record<Language, Translations> = {
       stateAssembled: "100% FACTORY SEALED",
     },
     about: {
-      sectionIndex: "01 — ABOUT US & ON-SITE REALITY",
-      heading: "Field Precision. Inside Every Room.",
+      sectionIndex: "01 — ABOUT HOOK AIR SERVICE",
+      heading: "From Doorstep Fleet Arrival to Living-Room Precision.",
       lead:
-        "From the moment our service fleet arrives at your residence to the final digital airflow verification on the ladder, every step follows a strict clinical protocol.",
-      videoCaption: "ON-SITE FIELD RECORDING — BANGKOK DISPATCH",
-      videoSub: "Scroll to scrub from fleet arrival to ladder coil overhaul",
+        "Experience our first-person on-site walkthrough: walking between our signature white-and-blue three-wheeled service trucks, stepping respectfully through your glass sliding doors, and ascending the service ladder for clinical coil disassembly.",
+      videoCaption: "FPOV ON-SITE WALKTHROUGH — BANGKOK DISPATCH",
+      videoSub:
+        "Scroll to scrub through 01 Arrival → 02 Threshold → 03 Precision Care",
+      playFullBtn: "Play Full Walkthrough with 1 Click",
+      scrubModeBtn: "Return to Scroll-Scrub Mode",
+      stageLabels: ["01 Arrival", "02 Threshold", "03 Precision Care"],
       pillars: [
         {
           num: "01",
-          title: "Mobile Fleet Dispatch",
+          subtitle: "OUR ORIGIN — WHEN HOOK AIR SERVICE STARTED",
+          title:
+            "Established to Elevate Thai Aircon Servicing into Disciplined Engineering.",
           body:
-            "Dedicated Hook Air Service teams arrive with 150 PSI inverter-safe pressure rigs, closed wastewater recovery tanks, and full Condo Juristic documentation.",
-          timecode: "00:00 — ARRIVAL",
+            "Hook Air Service was founded with a singular mission: to transform residential and condominium air-conditioning care in Thailand from informal, unpredictable handyman visits into a disciplined, engineering-grade home service—symbolized by our custom fleet of white-and-blue three-wheeled service trucks arriving directly at your doorstep.",
+          timecode: "01 ARRIVAL // THREE-WHEELED FLEET",
         },
         {
           num: "02",
-          title: "360° Room & Floor Containment",
+          subtitle: "WHAT WE DO — CLINICAL DISASSEMBLY & HOME RESPECT",
+          title:
+            "Cleaning, Repair, Installation & Relocation — Transparently Starting at 400 THB.",
           body:
-            "Before a single fastener is removed, we lay protective floor mats, seal the indoor PCB electronics in a waterproof housing, and fit a zero-drip catchment chute.",
-          timecode: "00:15 — CONTAINMENT",
+            "We deliver comprehensive air-conditioning cleaning, repair, installation, and relocation starting at 400 THB. As captured in our walkthrough—stepping through white-framed glass sliding doors with clean-shoe/barefoot respect, laying down protective floor tarps, and ascending our matte-black ladder in uniform—we execute full front-fascia and filter disassembly and 150 PSI coil flushing across all 13 global brands.",
+          timecode: "02 THRESHOLD & 03 PRECISION CARE",
         },
         {
           num: "03",
-          title: "Ladder Disassembly & Deep Flush",
+          subtitle: "FOUNDER'S MESSAGE — A PERSONAL PROMISE",
+          title: "Absolute Trust Inside Your Living Space.",
           body:
-            "Complete extraction of the fascia, filters, drain pan, and cross-flow squirrel-cage blower, followed by high-pressure coil sanitization and a 30-day leak warranty.",
-          timecode: "00:30 — OVERHAUL",
+            "Every technician is trained not only in inverter electronics and high-pressure hydro-sanitization, but in homeowner etiquette—leaving your floors, walls, and indoor air cleaner than when we arrived.",
+          timecode: "03 EXECUTIVE STANDARD",
         },
       ],
+      founder: {
+        eyebrow: "03 / FOUNDER'S MESSAGE — A PERSONAL PROMISE",
+        quote:
+          "When we started Hook Air Service, we realized that inviting a technician into your living room requires absolute trust. We don't just clean air-conditioners—we protect the air your family breathes, respect the cleanliness of your home, and guard your privacy and comfort as if it were our own.",
+        author: "Founder & Chief Service Architect",
+        role: "HOOK AIR SERVICE (ฮูก แอร์เซอร์วิส) • BANGKOK",
+        signature: "Hook Air Service Executive Directorate",
+      },
+      milestones: [
+        { value: "13+", label: "Global Brands Mastered" },
+        { value: "100%", label: "Deep Coil Disassembly" },
+        { value: "400.-", label: "Transparent Starting Rate (THB)" },
+      ],
       metrics: {
-        units: { value: "18,400+", label: "Units Restored Across Bangkok" },
-        warranty: { value: "30 Days", label: "Water Leak & Cooling Warranty" },
-        compliance: { value: "100%", label: "Condo Juristic Permit Compliant" },
+        units: { value: "13+", label: "Global Brands Mastered" },
+        warranty: { value: "100%", label: "Deep Coil Disassembly" },
+        compliance: { value: "400.-", label: "Transparent Starting Rate" },
       },
     },
     services: {
@@ -662,39 +703,65 @@ const translations: Record<Language, Translations> = {
       stateAssembled: "100% ประกอบสมบูรณ์พร้อมใช้งาน",
     },
     about: {
-      sectionIndex: "01 — เกี่ยวกับเราและการปฏิบัติงานจริง",
-      heading: "ความปราณีตในทุกขั้นตอน ตั้งแต่หน้าบ้านจนถึงบนบันได",
+      sectionIndex: "01 — เกี่ยวกับ ฮูก แอร์เซอร์วิส (ABOUT US)",
+      heading: "จากขบวนรถบริการหน้าบ้าน สู่ความประณีตในห้องนั่งเล่นของคุณ",
       lead:
-        "ตั้งแต่วินาทีที่รถบริการของ ฮูก แอร์เซอร์วิส จอดเทียบหน้าโครงการ จนถึงการขึ้นบันไดตรวจวัดความเร็วลมขั้นตอนสุดท้าย ทุกขั้นตอนถูกควบคุมด้วยมาตรฐานความสะอาดระดับสูงสุด",
-      videoCaption: "บันทึกการปฏิบัติงานจริง — ทีมช่าง ฮูก แอร์เซอร์วิส",
-      videoSub: "เลื่อนหน้าจอเพื่อดูการทำงานตั้งแต่รถบริการไปจนถึงช่างบนบันได",
+        "สัมผัสการทำงานจริงแบบ First-Person ของทีมฮูก แอร์เซอร์วิส ตั้งแต่การเดินผ่านขบวนรถสามล้อบริการสีขาว-น้ำเงินหน้าบ้าน ก้าวผ่านประตูกระจกขอบขาวด้วยความเคารพสถานที่ ไปจนถึงช่างชุดน้ำเงินบนบันไดดำที่ถอดล้างแอร์อย่างพิถีพิถัน",
+      videoCaption: "บันทึกมุมมองหน้างานจริง (FPOV WALKTHROUGH) — ฮูก แอร์เซอร์วิส",
+      videoSub:
+        "เลื่อนสกรอลล์เพื่อรับชม 01 ขบวนรถถึงหน้าบ้าน → 02 เข้าพื้นที่ → 03 ถอดล้างลึกบนบันได",
+      playFullBtn: "เล่นวิดีโอเต็มแบบต่อเนื่อง (คลิกเดียว)",
+      scrubModeBtn: "กลับสู่โหมดเลื่อนตามสกรอลล์",
+      stageLabels: [
+        "01 ขบวนรถถึงหน้าบ้าน",
+        "02 เข้าพื้นที่ด้วยความเคารพ",
+        "03 ถอดล้างลึกบนบันได",
+      ],
       pillars: [
         {
           num: "01",
-          title: "หน่วยรถบริการเคลื่อนที่พร้อมอุปกรณ์ครบมือ",
+          subtitle: "จุดเริ่มต้นของ ฮูก แอร์เซอร์วิส (OUR ORIGIN)",
+          title:
+            "ก่อตั้งขึ้นเพื่อยกระดับงานช่างแอร์ไทย สู่บริการมาตรฐานวิศวกรรมมืออาชีพ",
           body:
-            "ทีมช่างเดินทางด้วยรถบริการเฉพาะทาง พร้อมปั๊มแรงดันสูงระบบอินเวอร์เตอร์เสียงเงียบ ถังเก็บน้ำเสียระบบปิด และเอกสารลงทะเบียนนิติบุคคลคอนโดครบถ้วน",
-          timecode: "00:00 — เดินทางถึงหน้างาน",
+            "ฮูก แอร์เซอร์วิส เริ่มต้นขึ้นด้วยพันธกิจที่ชัดเจน คือการยกระดับงานบริการแอร์บ้านและคอนโดมิเนียมในประเทศไทย จากงานช่างทั่วไปที่ไร้มาตรฐานแน่นอน ให้กลายเป็นบริการระดับมืออาชีพที่มีระเบียบแบบแผน สัญลักษณ์สำคัญของเราคือขบวนรถสามล้อบริการสีขาว-น้ำเงินที่พร้อมเดินทางเข้าถึงหน้าบ้านคุณอย่างตรงเวลา พร้อมอุปกรณ์มาตรฐานครบมือ",
+          timecode: "01 ARRIVAL // ขบวนรถสามล้อบริการ",
         },
         {
           num: "02",
-          title: "คลุมผ้าใบและปกป้องพื้นที่ภายในห้อง 360 องศา",
+          subtitle: "มาตรฐานและสิ่งที่เราทำ (WHAT WE DO)",
+          title:
+            "บริการล้าง ซ่อม ติดตั้ง และย้ายแอร์ครบวงจร — เริ่มต้นเพียง 400 บาท",
           body:
-            "ก่อนเริ่มถอดน็อตทุกตัว ช่างจะปูแผ่นรองพื้นกันรอย หุ้มแผงวงจรไฟฟ้า (PCB) ด้วยถุงกันน้ำนิรภัย และติดตั้งกรวยผ้าใบรับน้ำเสียเข้าสู่ถังปิดโดยไม่เลอะพื้นห้อง",
-          timecode: "00:15 — ป้องกันพื้นที่",
+            "เราเชี่ยวชาญด้านการล้างแอร์ ซ่อมแอร์ ติดตั้ง และย้ายจุดติดตั้ง ในราคาโปร่งใสเริ่มต้นเพียง 400 บาท ดังที่ปรากฏในวิดีโอหน้างานจริง—เราให้ความเคารพต่อความสะอาดของบ้านตั้งแต่การถอดรองเท้าก่อนก้าวผ่านประตูกระจก การปูผ้าใบกันเปื้อน ไปจนถึงช่างในชุดยูนิฟอร์มสีน้ำเงินบนบันไดดำที่ถอดหน้ากาก ฟิลเตอร์ และฉีดล้างคอยล์ด้วยแรงดัน 150 PSI รองรับครบทั้ง 13 แบรนด์ชั้นนำ",
+          timecode: "02 THRESHOLD & 03 PRECISION CARE",
         },
         {
           num: "03",
-          title: "ถอดล้างลึกบนบันไดเซฟตี้และรับประกัน 30 วัน",
+          subtitle: "สารจากผู้ก่อตั้ง (FOUNDER'S MESSAGE)",
+          title: "ความไว้วางใจสูงสุดเมื่อเปิดบ้านต้อนรับทีมช่างของเรา",
           body:
-            "ถอดหน้ากาก แผ่นกรอง ถาดน้ำทิ้ง และพัดลมโพรงกระรอกออกมาล้างทำความสะอาด อัดฉีดคอยล์เย็นและท่อน้ำทิ้ง พร้อมรับประกันอาการน้ำหยดนาน 30 วันเต็ม",
-          timecode: "00:30 — ล้างใหญ่เต็มระบบ",
+            "ช่างทุกคนของ ฮูก แอร์เซอร์วิส ผ่านการฝึกอบรมทั้งทักษะวิศวกรรมเครื่องปรับอากาศอินเวอร์เตอร์ และมารยาทการปฏิบัติงานในที่พักอาศัย เพื่อส่งมอบทั้งความเย็นบริสุทธิ์และความสบายใจให้ทุกครอบครัว",
+          timecode: "03 EXECUTIVE STANDARD",
         },
       ],
+      founder: {
+        eyebrow: "03 / สารจากผู้ก่อตั้ง — คำมั่นสัญญาจากใจ (FOUNDER'S MESSAGE)",
+        quote:
+          "เมื่อเราเริ่มต้น ฮูก แอร์เซอร์วิส เราตระหนักดีว่าการเปิดบ้านต้อนรับช่างเข้ามาในห้องนั่งเล่นต้องอาศัยความไว้วางใจสูงสุด เราจึงไม่ได้เป็นเพียงคนล้างแอร์ แต่เราคือผู้ปกป้องอากาศที่ครอบครัวคุณหายใจ เคารพความสะอาดของบ้านคุณ และดูแลความเป็นส่วนตัวและความสบายของคุณเสมือนเป็นบ้านของเราเอง",
+        author: "ผู้ก่อตั้งและหัวหน้าทีมวิศวกรรมบริการ",
+        role: "ฮูก แอร์เซอร์วิส (HOOK AIR SERVICE) • กรุงเทพฯ และปริมณฑล",
+        signature: "Hook Air Service Executive Directorate",
+      },
+      milestones: [
+        { value: "13+", label: "แบรนด์ชั้นนำระดับโลกที่เชี่ยวชาญ" },
+        { value: "100%", label: "ถอดล้างลึกถึงแผงคอยล์และโพรงกระรอก" },
+        { value: "400.-", label: "ราคาเริ่มต้นโปร่งใส (บาท)" },
+      ],
       metrics: {
-        units: { value: "18,400+", label: "เครื่องที่ผ่านการล้างใหญ่ใน กทม." },
-        warranty: { value: "30 วัน", label: "รับประกันน้ำแอร์หยดและแอร์ไม่เย็น" },
-        compliance: { value: "100%", label: "ผ่านระเบียบนิติบุคคลคอนโดทุกโครงการ" },
+        units: { value: "13+", label: "แบรนด์ชั้นนำระดับโลกที่เชี่ยวชาญ" },
+        warranty: { value: "100%", label: "ถอดล้างลึกถึงแผงคอยล์และโพรงกระรอก" },
+        compliance: { value: "400.-", label: "ราคาเริ่มต้นโปร่งใส (บาท)" },
       },
     },
     services: {
