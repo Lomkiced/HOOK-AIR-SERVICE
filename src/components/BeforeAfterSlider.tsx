@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { MoveHorizontal, Sparkles, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function BeforeAfterSlider() {
@@ -50,21 +49,26 @@ export function BeforeAfterSlider() {
   };
 
   return (
-    <section id="comparison" className="py-24 lg:py-32 bg-white">
+    <div id="comparison" className="py-20 lg:py-28 bg-white border-t border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Minimal Single-Word Heading */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
-          <div>
-            <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.02]">
-              {t.slider.heading}
-            </h2>
-            <p className="mt-3 text-lg sm:text-xl text-[#334155] font-medium">
-              {t.slider.sub}
-            </p>
-          </div>
-          <span className="text-xs font-extrabold uppercase tracking-wider text-[#0369A1]">
+        {/* Top Section Index Bar */}
+        <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-10">
+          <span className="font-mono text-xs font-extrabold uppercase tracking-[0.18em] text-[#0284C7]">
+            {t.slider.sectionIndex}
+          </span>
+          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#0369A1]">
             {t.slider.instruction}
           </span>
+        </div>
+
+        {/* Editorial Heading */}
+        <div className="max-w-3xl mb-12">
+          <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.03]">
+            {t.slider.heading}
+          </h2>
+          <p className="mt-4 text-lg sm:text-xl text-[#334155] font-medium leading-relaxed">
+            {t.slider.sub}
+          </p>
         </div>
 
         {/* Interactive Split-Screen Coil Comparison Stage */}
@@ -129,8 +133,7 @@ export function BeforeAfterSlider() {
             </svg>
 
             <div className="relative z-10 flex justify-end">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FACC15] text-[#0F172A] text-xs sm:text-sm font-extrabold">
-                <Sparkles className="w-4 h-4" />
+              <span className="inline-block px-4 py-1.5 rounded-full bg-[#FACC15] text-[#0F172A] font-mono text-xs sm:text-sm font-extrabold tracking-wider uppercase">
                 {t.slider.after.label}
               </span>
             </div>
@@ -140,7 +143,7 @@ export function BeforeAfterSlider() {
               <div className="text-5xl sm:text-7xl font-extrabold tracking-tight text-white tabular-nums">
                 {t.slider.after.temp}
               </div>
-              <div className="mt-2 inline-flex flex-wrap justify-end gap-3 text-xs sm:text-sm font-bold text-[#E0F2FE]">
+              <div className="mt-2 inline-flex flex-wrap justify-end gap-3 font-mono text-xs sm:text-sm font-bold text-[#E0F2FE] tabular-nums">
                 <span>
                   {t.slider.blockageLabel}: {t.slider.after.blockage}
                 </span>
@@ -191,8 +194,7 @@ export function BeforeAfterSlider() {
             </svg>
 
             <div className="relative z-10 flex justify-start">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-[#0F172A] text-xs sm:text-sm font-extrabold">
-                <AlertTriangle className="w-4 h-4 text-[#EAB308]" />
+              <span className="inline-block px-4 py-1.5 rounded-full bg-white text-[#0F172A] font-mono text-xs sm:text-sm font-extrabold tracking-wider uppercase">
                 {t.slider.before.label}
               </span>
             </div>
@@ -201,7 +203,7 @@ export function BeforeAfterSlider() {
               <div className="text-5xl sm:text-7xl font-extrabold tracking-tight text-[#FACC15] tabular-nums">
                 {t.slider.before.temp}
               </div>
-              <div className="mt-2 inline-flex flex-wrap gap-3 text-xs sm:text-sm font-bold text-slate-300">
+              <div className="mt-2 inline-flex flex-wrap gap-3 font-mono text-xs sm:text-sm font-bold text-slate-300 tabular-nums">
                 <span>
                   {t.slider.blockageLabel}: {t.slider.before.blockage}
                 </span>
@@ -214,18 +216,61 @@ export function BeforeAfterSlider() {
           </div>
 
           {/* ==============================================================
-              DIVIDER LINE & HANDLE
+              DIVIDER LINE & MINIMAL FUNCTIONAL HANDLE
           ============================================================== */}
           <div
             className="absolute top-0 bottom-0 z-20 w-1 bg-[#FACC15] pointer-events-none"
             style={{ left: `${sliderPosition}%` }}
           >
             <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#FACC15] border-4 border-[#0F172A] shadow-lg flex items-center justify-center text-[#0F172A]">
-              <MoveHorizontal className="w-5 h-5 stroke-[2.5]" />
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M8 7l-5 5 5 5" />
+                <path d="M16 7l5 5-5 5" />
+              </svg>
             </div>
           </div>
         </div>
+
+        {/* Editorial Before vs After Diagnostic Summary Bar */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="rounded-2xl bg-[#0F172A] text-white p-6 border border-slate-800 flex items-start justify-between gap-4">
+            <div>
+              <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
+                {t.slider.before.label}
+              </span>
+              <p className="mt-2 text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
+                {t.slider.before.summary}
+              </p>
+            </div>
+            <span className="font-mono text-xl font-extrabold text-[#FACC15] tabular-nums shrink-0">
+              {t.slider.before.temp}
+            </span>
+          </div>
+
+          <div className="rounded-2xl bg-[#F8FAFC] text-[#0F172A] p-6 border border-[#0284C7]/40 flex items-start justify-between gap-4">
+            <div>
+              <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-[#0284C7]">
+                {t.slider.after.label}
+              </span>
+              <p className="mt-2 text-sm sm:text-base text-[#334155] font-medium leading-relaxed">
+                {t.slider.after.summary}
+              </p>
+            </div>
+            <span className="font-mono text-xl font-extrabold text-[#0284C7] tabular-nums shrink-0">
+              {t.slider.after.temp}
+            </span>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

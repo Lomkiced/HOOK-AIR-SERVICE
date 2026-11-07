@@ -5,14 +5,28 @@ import type { BrandId } from "@/lib/brands";
 
 export type Language = "en" | "th";
 
-export interface StoryBeat {
+export interface HeroMilestone {
+  index: string;
+  phase: string;
   title: string;
   sub: string;
 }
 
-export interface LayerLabel {
-  name: string;
-  spec: string;
+export interface FpovPillar {
+  num: string;
+  title: string;
+  body: string;
+  timecode: string;
+}
+
+export interface ServicePillar {
+  num: string;
+  category: string;
+  title: string;
+  price: string;
+  unitNote: string;
+  description: string;
+  specs: string[];
 }
 
 export interface BrandProfile {
@@ -45,23 +59,48 @@ export interface DistrictZone {
 export interface Translations {
   nav: {
     brandName: string;
-    brandTagline: string;
+    brandSub: string;
+    home: string;
+    about: string;
+    services: string;
     brands: string;
-    comparison: string;
-    propertyTypes: string;
-    bookCleaning: string;
+    contact: string;
+    bookService: string;
     staffPortal: string;
     langSwitchLabel: string;
   };
-  story: {
-    beats: StoryBeat[];
-    scrollHint: string;
-    scrubLabel: string;
-    assembled: string;
-    exploded: string;
-    layers: LayerLabel[];
+  hero: {
+    eyebrow: string;
+    milestones: HeroMilestone[];
+    cta: string;
+    secondaryCta: string;
+    scrollPrompt: string;
+    assemblyProgressLabel: string;
+    stateExploded: string;
+    stateAssembled: string;
+  };
+  about: {
+    sectionIndex: string;
+    heading: string;
+    lead: string;
+    videoCaption: string;
+    videoSub: string;
+    pillars: FpovPillar[];
+    metrics: {
+      units: { value: string; label: string };
+      warranty: { value: string; label: string };
+      compliance: { value: string; label: string };
+    };
+  };
+  services: {
+    sectionIndex: string;
+    heading: string;
+    sub: string;
+    bookProtocol: string;
+    matrix: ServicePillar[];
   };
   brands: {
+    sectionIndex: string;
     heading: string;
     sub: string;
     dockLabel: string;
@@ -74,12 +113,13 @@ export interface Translations {
     profiles: Record<BrandId, BrandProfile>;
   };
   slider: {
+    sectionIndex: string;
     heading: string;
     sub: string;
     instruction: string;
     ariaLabel: string;
-    before: { label: string; temp: string; blockage: string; energy: string };
-    after: { label: string; temp: string; blockage: string; energy: string };
+    before: { label: string; temp: string; blockage: string; energy: string; summary: string };
+    after: { label: string; temp: string; blockage: string; energy: string; summary: string };
     tempLabel: string;
     blockageLabel: string;
     energyLabel: string;
@@ -92,11 +132,24 @@ export interface Translations {
     book: string;
     profiles: { condo: PropertyProfile; house: PropertyProfile };
   };
-  closing: {
-    title: string;
+  contact: {
+    sectionIndex: string;
+    heading: string;
     sub: string;
-    cta: string;
-    line: string;
+    phoneTitle: string;
+    phonePrimary: string;
+    phoneSecondary: string;
+    phoneNote: string;
+    lineTitle: string;
+    lineHandle: string;
+    lineNote: string;
+    hoursTitle: string;
+    hoursValue: string;
+    hoursSub: string;
+    coverageTitle: string;
+    coverageSub: string;
+    primaryCta: string;
+    lineCta: string;
   };
   serviceArea: {
     zones: DistrictZone[];
@@ -152,149 +205,314 @@ const translations: Record<Language, Translations> = {
   en: {
     nav: {
       brandName: "HOOK AIR SERVICE",
-      brandTagline: "Bangkok aircon hygiene",
+      brandSub: "ฮูก แอร์เซอร์วิส",
+      home: "Home",
+      about: "About Us",
+      services: "Services",
       brands: "Brands",
-      comparison: "Before & After",
-      propertyTypes: "Condo vs. House",
-      bookCleaning: "Book Now",
+      contact: "Contact Us",
+      bookService: "Book Service",
       staffPortal: "Staff Portal",
       langSwitchLabel: "Switch language between English and Thai",
     },
-    story: {
-      beats: [
-        { title: "Pure.", sub: "Engineered aircon hygiene." },
-        { title: "Unveiled.", sub: "Every layer exposed." },
-        { title: "Sanitized.", sub: "150 PSI deep coil & blower flush." },
-        { title: "Mastered.", sub: "13 global brands. One standard." },
+    hero: {
+      eyebrow: "HOOK AIR SERVICE — CLINICAL HVAC OVERHAUL",
+      milestones: [
+        {
+          index: "01",
+          phase: "01 / DISASSEMBLY",
+          title: "Every Component. Exposed.",
+          sub: "100% disassembly down to the blower wheel and evaporator coil.",
+        },
+        {
+          index: "02",
+          phase: "02 / HYDRO-SANITIZATION",
+          title: "150 PSI. Zero Bacteria.",
+          sub: "Clinical-grade flushing eliminates hidden mold and biofilm.",
+        },
+        {
+          index: "03",
+          phase: "03 / CALIBRATED REBUILD",
+          title: "Rebuilt to Factory Spec.",
+          sub: "Laser-aligned louvers, sealed drainage, zero vibration.",
+        },
+        {
+          index: "04",
+          phase: "04 / ARCTIC OUTPUT",
+          title: "Pure Arctic Air.",
+          sub: "Restored heat-exchange efficiency. Immediate booking available.",
+        },
       ],
-      scrollHint: "Scroll or drag to take it apart",
-      scrubLabel: "Explode and reassemble the air conditioner",
-      assembled: "Assembled",
-      exploded: "Exploded",
-      layers: [
-        { name: "Aerodynamic fascia", spec: "Smart LED display · 18°C" },
-        { name: "Honeycomb pre-filters", spec: "Dual high-density mesh" },
-        { name: "Evaporator coil", spec: "Copper tube · blue aluminium fins" },
-        { name: "Cross-flow blower", spec: "Squirrel-cage barrel" },
-        { name: "Chassis & drain pan", spec: "Louver swing assembly" },
+      cta: "Book Service",
+      secondaryCta: "Explore Protocols",
+      scrollPrompt: "Scroll to scrub assembly sequence",
+      assemblyProgressLabel: "ASSEMBLY SEQUENCE",
+      stateExploded: "00% EXPLODED CORE",
+      stateAssembled: "100% FACTORY SEALED",
+    },
+    about: {
+      sectionIndex: "01 — ABOUT US & ON-SITE REALITY",
+      heading: "Field Precision. Inside Every Room.",
+      lead:
+        "From the moment our service fleet arrives at your residence to the final digital airflow verification on the ladder, every step follows a strict clinical protocol.",
+      videoCaption: "ON-SITE FIELD RECORDING — BANGKOK DISPATCH",
+      videoSub: "Scroll to scrub from fleet arrival to ladder coil overhaul",
+      pillars: [
+        {
+          num: "01",
+          title: "Mobile Fleet Dispatch",
+          body:
+            "Dedicated Hook Air Service teams arrive with 150 PSI inverter-safe pressure rigs, closed wastewater recovery tanks, and full Condo Juristic documentation.",
+          timecode: "00:00 — ARRIVAL",
+        },
+        {
+          num: "02",
+          title: "360° Room & Floor Containment",
+          body:
+            "Before a single fastener is removed, we lay protective floor mats, seal the indoor PCB electronics in a waterproof housing, and fit a zero-drip catchment chute.",
+          timecode: "00:15 — CONTAINMENT",
+        },
+        {
+          num: "03",
+          title: "Ladder Disassembly & Deep Flush",
+          body:
+            "Complete extraction of the fascia, filters, drain pan, and cross-flow squirrel-cage blower, followed by high-pressure coil sanitization and a 30-day leak warranty.",
+          timecode: "00:30 — OVERHAUL",
+        },
+      ],
+      metrics: {
+        units: { value: "18,400+", label: "Units Restored Across Bangkok" },
+        warranty: { value: "30 Days", label: "Water Leak & Cooling Warranty" },
+        compliance: { value: "100%", label: "Condo Juristic Permit Compliant" },
+      },
+    },
+    services: {
+      sectionIndex: "02 — SERVICES & TECHNICAL PROTOCOLS",
+      heading: "Four Disciplines. Zero Shortcuts.",
+      sub:
+        "Transparent, all-inclusive pricing engineered for high-rise condominiums and multi-unit residential homes across Greater Bangkok.",
+      bookProtocol: "Select Protocol",
+      matrix: [
+        {
+          num: "01",
+          category: "CONDOMINIUM PROTOCOL",
+          title: "High-Rise Zero-Splash Deep Clean",
+          price: "฿550",
+          unitNote: "/ unit (2+ units) • Single unit ฿650",
+          description:
+            "Tailored for Bangkok condominiums with narrow balconies, engineered wood flooring, and strict Juristic noise and water containment regulations.",
+          specs: [
+            "Juristic Office contractor registration & work permit coordination",
+            "360° waterproof catchment funnel into sealed wastewater tank",
+            "Balcony condenser splash shield — zero overspray to neighbors",
+            "High-pressure condensate drain line flush & 30-day warranty",
+          ],
+        },
+        {
+          num: "02",
+          category: "RESIDENTIAL HOUSE & VILLA",
+          title: "Multi-Unit Whole-Home Overhaul",
+          price: "฿500",
+          unitNote: "/ unit (3+ units) • 1–2 units ฿600",
+          description:
+            "Executed by a two-technician crew for detached homes and townhomes facing heavy outdoor garden dust, kitchen grease film, and long PVC drain runs.",
+          specs: [
+            "Pre-wash capacitor, compressor amperage & ΔT thermal audit",
+            "Full blower barrel removal & alkaline kitchen-grease lifting foam",
+            "Outdoor garden condenser mud & leaf descaling wash",
+            "15-meter main PVC drainage line hydro-jet purge",
+          ],
+        },
+        {
+          num: "03",
+          category: "COMMERCIAL & LUXURY SYSTEMS",
+          title: "4-Way Ceiling Cassette & Concealed Duct",
+          price: "฿1,400",
+          unitNote: "/ unit (18,000 – 48,000 BTU)",
+          description:
+            "Precision disassembly for four-way ceiling cassettes and concealed ducted systems in penthouses, villas, and executive offices.",
+          specs: [
+            "Centrifugal turbo fan wheel & condensate float-switch disassembly",
+            "Internal condensate lift-pump reservoir sanitization",
+            "Ceiling access panel & diffuser grille restoration",
+            "R32 / R410A operating pressure & subcooling verification",
+          ],
+        },
+        {
+          num: "04",
+          category: "CLINICAL REMEDIATION",
+          title: "Biofilm Eradication & Leak Recovery",
+          price: "฿850",
+          unitNote: "/ unit (heavily fouled or leaking units)",
+          description:
+            "Intensive restoration for air conditioners suffering from chronic water overflow, black mold colonization, or severe airflow blockage.",
+          specs: [
+            "Dual-side evaporator core chemical-free pH-neutral foam soak",
+            "Nitrogen & high-pressure drain pan algae extraction",
+            "Botanical quaternary ammonium anti-microbial fogging",
+            "Post-service digital anemometer velocity & temperature report",
+          ],
+        },
       ],
     },
     brands: {
-      heading: "Every brand.",
-      sub: "One certified standard, tuned to each manufacturer's engineering.",
-      dockLabel: "Choose your air conditioner brand",
-      techLabel: "Signature engineering",
-      methodLabel: "How we clean it",
-      pressureLabel: "Coil wash pressure",
-      timeLabel: "Service time",
-      minutes: "min",
-      preview: "Preview in 3D exploded rig",
+      sectionIndex: "03 — CERTIFIED BRAND ARCHITECTURE",
+      heading: "13 Global Manufacturers. One Standard.",
+      sub:
+        "Every air conditioner brand uses distinct coil coatings, ionizers, and louver mechanics. Select a manufacturer below to inspect our dedicated service protocol.",
+      dockLabel: "SELECT MANUFACTURER TO INSPECT PROTOCOL",
+      techLabel: "01 / SIGNATURE HARDWARE ARCHITECTURE",
+      methodLabel: "02 / HOOK AIR SERVICE PROTOCOL",
+      pressureLabel: "03 / CALIBRATED WASH PRESSURE",
+      timeLabel: "04 / BENCHMARK SERVICE DURATION",
+      minutes: "MIN",
+      preview: "Sync Brand to Hero Rig",
       profiles: {
         daikin: {
-          tech: "Coanda airflow & Streamer purifier",
-          method: "Coanda louver and Streamer unit come off first, then a fin-safe coil flush.",
+          tech: "Coanda Airflow Louvers & Streamer Discharge Module",
+          method:
+            "We detach the Coanda dual-flaps and isolate the high-voltage Streamer unit before flushing the Blue-Fin evaporator at 120 PSI.",
         },
         mitsubishi: {
-          tech: "Dual Barrier Coating",
-          method: "pH-neutral foam only, so the anti-dust, anti-oil coating survives every wash.",
+          tech: "Dual Barrier Coating & Easy-Clean Chassis",
+          method:
+            "Washed strictly with pH-neutral solutions and calibrated 90 PSI fan-jets so the factory fluorine-hydrophilic Dual Barrier Coating remains intact.",
         },
         carrier: {
-          tech: "Self-clean coil cycle & ionizer",
-          method: "Ionizer sealed, then a full coil and drain-pan flush to clear what self-clean leaves behind.",
+          tech: "Xpower Gold Ionizer & Self-Clean Evaporator",
+          method:
+            "The Xpower ionizer assembly is sealed in a dry enclosure while we deep-flush the rear coil face and condensate trough that automated cycles cannot reach.",
         },
         haier: {
-          tech: "Frost self-clean & 56°C sterilization",
-          method: "Thermal sensor guarded; we flush out the frost-loosened grime the cycle can't drain.",
+          tech: "Frost Self-Clean & 56°C Sterilization Matrix",
+          method:
+            "Thermistor probes are shielded before extracting the squirrel-cage barrel and flushing calcified biofilm from the primary drain spout.",
         },
         amena: {
-          tech: "Heavy-duty Thai residential coil",
-          method: "Full-pressure coil flush tuned for Bangkok dust and long condo drain runs.",
+          tech: "Heavy-Duty Thai Tropical Condenser & Evaporator",
+          method:
+            "Full 150 PSI dual-angle hydro-flushing engineered for dense Bangkok PM2.5 buildup and long condominium drainage runs.",
         },
         samsung: {
-          tech: "WindFree 23,000 micro-holes",
-          method: "Ultrasonic clearing of the micro-hole panel, then a blower and coil deep wash.",
+          tech: "WindFree 23,000 Micro-Hole Dispersion Fascia",
+          method:
+            "The perforated WindFree fascia is detached and ultrasonically cleared so all 23,000 micro-apertures breathe freely without condensation sweating.",
         },
         toshiba: {
-          tech: "Magic Coil coating & Ultra Pure filter",
-          method: "Coating-safe rinse and filter rebuild, never abrasive brushing.",
+          tech: "Magic Coil Aqua-Resin Coating & Ultra-Pure Filter",
+          method:
+            "Non-abrasive laminar water jets preserve the aqua-resin Magic Coil layer while the blower wheel is balanced and sanitized outside the chassis.",
         },
         tcl: {
-          tech: "Hydrophilic blue-fin coil",
-          method: "Straight-line nozzle passes keep the hydrophilic layer intact while lifting grime.",
+          tech: "Titan Gold Hydrophilic Fin Array",
+          method:
+            "Vertical precision nozzle passes remove embedded dust cake between the Titan Gold fins without deforming thin aluminum edges.",
         },
         sharp: {
-          tech: "Plasmacluster ion generator",
-          method: "Ion generator removed and dry-cleaned; coil and blower flushed separately.",
+          tech: "Plasmacluster Ion Generator & Long Coanda Panel",
+          method:
+            "The Plasmacluster electrode cartridge is removed and dry-cleaned separately prior to full high-pressure coil and drain-tray sanitization.",
         },
         midea: {
-          tech: "Active Clean high-temperature cycle",
-          method: "Sensor wiring isolated, then a full evaporator and squirrel-cage flush.",
+          tech: "PrimeGuard Golden Fin & Active Clean Core",
+          method:
+            "Control harness and louver stepper motors are isolated before a complete evaporator, rear-duct, and blower wheel overhaul.",
         },
         fujitsu: {
-          tech: "Large-diameter fan & apple-catechin filter",
-          method: "The oversized blower barrel is washed outside the unit; filters refreshed.",
+          tech: "Oversized Cross-Flow Turbine & Apple-Catechin Filter",
+          method:
+            "The large-diameter cylindrical fan barrel is extracted for deep blade descaling while catechin and ion-deodorizing filters are refreshed.",
         },
         lg: {
-          tech: "DUAL Inverter & Gold Fin coil",
-          method: "Coated fins rinsed at low pressure, then compressor amps checked after.",
+          tech: "DUAL Inverter Compressor & Gold Fin™ Heat Exchanger",
+          method:
+            "Low-turbulence 100 PSI coil rinse protects the corrosion-resistant Gold Fin™ layer, followed by a post-wash inverter amperage verification.",
         },
         panasonic: {
-          tech: "nanoe X generator",
-          method: "nanoe X module shielded while coil, drain pan and blower get a full flush.",
+          tech: "nanoe™ X Hydroxyl Radical Generator & Aerowings",
+          method:
+            "The nanoe™ X atomizer is hermetically masked while twin Aerowings blades, coil fins, and rear condensate channels receive a clinical flush.",
         },
       },
     },
     slider: {
-      heading: "Difference.",
-      sub: "Six months of Bangkok air, against one visit.",
-      instruction: "Drag to compare",
+      sectionIndex: "INTERNAL COIL INSPECTION",
+      heading: "Six Months of Bangkok Dust. Gone in One Visit.",
+      sub: "Drag the inspection divider to compare an unwashed evaporator core against our 150 PSI clinical restoration.",
+      instruction: "DRAG DIVIDER LEFT OR RIGHT",
       ariaLabel: "Before and after coil cleaning comparison",
-      before: { label: "Before", temp: "19.8°C", blockage: "78%", energy: "+34%" },
-      after: { label: "After", temp: "10.5°C", blockage: "0%", energy: "Factory" },
-      tempLabel: "Vent temperature",
-      blockageLabel: "Fin blockage",
-      energyLabel: "Energy draw",
+      before: {
+        label: "01 / BEFORE OVERHAUL",
+        temp: "19.8°C",
+        blockage: "78%",
+        energy: "+34%",
+        summary: "Biofilm slime and PM2.5 dust block 78% of aluminum fins, causing water leaks and high electricity bills.",
+      },
+      after: {
+        label: "02 / AFTER 150 PSI OVERHAUL",
+        temp: "10.5°C",
+        blockage: "0%",
+        energy: "Optimal",
+        summary: "Unobstructed aluminum fins, sanitized blower wheel, and purged drainage restore crisp arctic airflow.",
+      },
+      tempLabel: "Discharge Temp",
+      blockageLabel: "Fin Blockage",
+      energyLabel: "Power Draw",
     },
     explorer: {
-      heading: "Condo. House.",
-      sub: "Two kinds of home. Two protocols.",
-      from: "From",
+      heading: "Architecture-Specific Execution.",
+      sub: "Toggle between our High-Rise Condominium and Residential House operating procedures.",
+      from: "All-Inclusive Rate From",
       perUnit: "/ unit",
-      book: "Book this protocol",
+      book: "Book This Protocol",
       profiles: {
         condo: {
-          tab: "Condo",
-          line: "Juristic paperwork, quiet pump, dry floors.",
+          tab: "01 / Condominium",
+          line: "Juristic permit coordination, whisper-quiet inverter pump, 100% dry floors.",
           price: "฿550",
-          duration: "45–60 min per unit",
-          units: "2+ units",
+          duration: "45–60 MIN / UNIT",
+          units: "2+ UNITS BUNDLE",
           steps: [
-            { title: "Sealed in.", line: "Floor mats, PCB dry-bag, closed waste-water tank." },
-            { title: "Blower out.", line: "Squirrel-cage and drain tray washed outside the unit." },
-            { title: "Balcony shielded.", line: "Condenser wrapped. Zero overspray on neighbours." },
-            { title: "Verified.", line: "Vent temperature and amps sent to your LINE." },
+            { title: "Sealed Containment", line: "Floor mats, PCB waterproof housing, closed wastewater recovery tank." },
+            { title: "Blower Extraction", line: "Squirrel-cage fan and drain pan removed and washed outside the unit." },
+            { title: "Balcony Shielding", line: "Outdoor condenser wrapped so zero dirty water splashes neighboring rooms." },
+            { title: "Digital Verification", line: "Discharge temperature and amperage report delivered via LINE." },
           ],
         },
         house: {
-          tab: "House",
-          line: "Two-technician crew. Up to 8 units in one visit.",
+          tab: "02 / House & Villa",
+          line: "Two-technician residential crew servicing up to 8 units in a single visit.",
           price: "฿500",
-          duration: "40–50 min per unit",
-          units: "3+ units",
+          duration: "40–50 MIN / UNIT",
+          units: "3+ UNITS BUNDLE",
           steps: [
-            { title: "Health check.", line: "Capacitor, amps and ΔT on every unit." },
-            { title: "Deep wash.", line: "150 PSI coil flush with grease-lifting foam." },
-            { title: "Outdoor revived.", line: "Condenser descaled, drain line jetted to the gutter." },
-            { title: "Sanitized.", line: "Anti-allergen mist and refrigerant pressure check." },
+            { title: "Diagnostic Audit", line: "Starting capacitor, compressor amps, and ΔT checked on every unit." },
+            { title: "150 PSI Coil Flush", line: "Dual-side evaporator wash with biodegradable kitchen-grease foam." },
+            { title: "Garden Condenser", line: "Outdoor unit descaled of mud and leaves; PVC drain line jetted to main trap." },
+            { title: "Clinical Fogging", line: "Botanical anti-microbial misting and R32/R410A pressure verification." },
           ],
         },
       },
     },
-    closing: {
-      title: "Breathe.",
-      sub: "Book in 30 seconds. Pay after the job is done.",
-      cta: "Book Cleaning",
-      line: "Chat on LINE",
+    contact: {
+      sectionIndex: "04 — CONTACT US & IMMEDIATE DISPATCH",
+      heading: "Direct Dispatch Across Greater Bangkok.",
+      sub:
+        "Speak directly with our bilingual scheduling desk or book instantly online. Zero travel surcharge across Bangkok, Nonthaburi, Pathum Thani, and Samut Prakan.",
+      phoneTitle: "01 / DIRECT TELEPHONE DISPATCH",
+      phonePrimary: "092-420-0043",
+      phoneSecondary: "098-364-9865",
+      phoneNote: "Immediate technician scheduling & Condo Juristic paperwork coordination.",
+      lineTitle: "02 / OFFICIAL LINE DISPATCH",
+      lineHandle: "@airconpro.th",
+      lineNote: "Send unit photos, request multi-unit quotes, or book in under 3 minutes.",
+      hoursTitle: "03 / OPERATING HOURS",
+      hoursValue: "08:00 – 20:00 Daily",
+      hoursSub: "Monday – Sunday, including all Thai Public Holidays.",
+      coverageTitle: "04 / ZERO-SURCHARGE COVERAGE ZONES",
+      coverageSub: "Sukhumvit • Sathorn • Silom • Rama 9 • Ratchada • Ari • Chatuchak • Bangna • Srinakarin • Thonburi • Nonthaburi",
+      primaryCta: "Open Instant Booking Estimator",
+      lineCta: "Connect via LINE Official",
     },
     serviceArea: {
       zones: [
@@ -392,155 +610,320 @@ const translations: Record<Language, Translations> = {
       hoursLabel: "Daily Dispatch Hours",
       hoursValue: "08:00 – 20:00 (Mon – Sun, including Public Holidays)",
       licenseText: "Department of Skill Development Certified HVAC Technicians • Tax ID Verified",
-      copyright: "© 2026 Hook Air Service Co., Ltd. All rights reserved.",
+      copyright: "© 2026 Hook Air Service Co., Ltd. (ฮูก แอร์เซอร์วิส). All rights reserved.",
     },
   },
   th: {
     nav: {
       brandName: "HOOK AIR SERVICE",
-      brandTagline: "ล้างแอร์ฆ่าเชื้อ กรุงเทพฯ",
-      brands: "แบรนด์",
-      comparison: "ก่อน-หลังล้าง",
-      propertyTypes: "คอนโด vs บ้าน",
-      bookCleaning: "จองคิว",
+      brandSub: "ฮูก แอร์เซอร์วิส",
+      home: "หน้าแรก",
+      about: "เกี่ยวกับเรา",
+      services: "บริการของเรา",
+      brands: "แบรนด์ที่รองรับ",
+      contact: "ติดต่อเรา",
+      bookService: "จองคิวล้างแอร์",
       staffPortal: "ระบบพนักงาน",
       langSwitchLabel: "สลับภาษาระหว่างภาษาอังกฤษและภาษาไทย",
     },
-    story: {
-      beats: [
-        { title: "บริสุทธิ์", sub: "นวัตกรรมการล้างแอร์ระดับพรีเมียม" },
-        { title: "ถอดทุกชิ้นส่วน", sub: "เปิดเผยทุกจุดซ่อนเร้น" },
-        { title: "สะอาดลึกถึงแกน", sub: "ฉีดล้างคอยล์และโพรงกระรอกด้วยแรงดันสูง" },
-        { title: "เชี่ยวชาญทุกแบรนด์", sub: "รองรับ 13 แบรนด์ชั้นนำ มาตรฐานเดียวที่เหนือกว่า" },
+    hero: {
+      eyebrow: "HOOK AIR SERVICE — มาตรฐานวิศวกรรมการล้างแอร์ระดับคลินิก",
+      milestones: [
+        {
+          index: "01",
+          phase: "01 / ถอดแยกชิ้นส่วน",
+          title: "ถอดล้างลึกทุกชิ้นส่วน",
+          sub: "รื้อถอดโครงสร้างภายในครบทุกชิ้น จนถึงพัดลมโพรงกระรอกและแผงคอยล์เย็น",
+        },
+        {
+          index: "02",
+          phase: "02 / ฉีดล้างฆ่าเชื้อแรงดันสูง",
+          title: "ฉีดล้างแรงดันสูง สะอาดไร้เชื้อโรค",
+          sub: "อัดฉีดน้ำแรงดันสูง 150 PSI ขจัดคราบเมือกเหนียวและเชื้อราสะสม 99.9%",
+        },
+        {
+          index: "03",
+          phase: "03 / ประกอบกลับมาตรฐานโรงงาน",
+          title: "ประกอบกลับอย่างปราณีตระดับโรงงาน",
+          sub: "ตั้งศูนย์ใบพัดและบานสวิงแม่นยำ ท่อเดรนน้ำทิ้งโล่งสนิท ไร้เสียงสั่นรบกวน",
+        },
+        {
+          index: "04",
+          phase: "04 / ความเย็นบริสุทธิ์",
+          title: "ความเย็นบริสุทธิ์ที่เหนือกว่า",
+          sub: "คืนประสิทธิภาพการแลกเปลี่ยนความร้อนเต็มกำลัง ประหยัดค่าไฟฟ้าทันที",
+        },
       ],
-      scrollHint: "เลื่อนหน้าจอหรือลากแถบเพื่อถอดชิ้นส่วน",
-      scrubLabel: "ถอดและประกอบชิ้นส่วนเครื่องปรับอากาศ",
-      assembled: "ประกอบ",
-      exploded: "ถอดชิ้นส่วน",
-      layers: [
-        { name: "หน้ากากแอร์", spec: "จอ LED อัจฉริยะ · 18°C" },
-        { name: "แผ่นกรองรังผึ้ง", spec: "ตาข่ายความละเอียดสูง 2 แผ่น" },
-        { name: "คอยล์เย็น", spec: "ท่อทองแดง · ครีบอะลูมิเนียม" },
-        { name: "พัดลมโพรงกระรอก", spec: "ใบพัดแบบ Cross-flow" },
-        { name: "โครงเครื่องและถาดน้ำทิ้ง", spec: "ชุดบานสวิงปรับทิศทางลม" },
+      cta: "จองคิวล้างแอร์",
+      secondaryCta: "ดูมาตรฐานบริการ",
+      scrollPrompt: "เลื่อนหน้าจอเพื่อดูขั้นตอนการถอดและประกอบชิ้นส่วน",
+      assemblyProgressLabel: "ลำดับการประกอบชิ้นส่วน",
+      stateExploded: "00% ถอดแยกชิ้นส่วนภายใน",
+      stateAssembled: "100% ประกอบสมบูรณ์พร้อมใช้งาน",
+    },
+    about: {
+      sectionIndex: "01 — เกี่ยวกับเราและการปฏิบัติงานจริง",
+      heading: "ความปราณีตในทุกขั้นตอน ตั้งแต่หน้าบ้านจนถึงบนบันได",
+      lead:
+        "ตั้งแต่วินาทีที่รถบริการของ ฮูก แอร์เซอร์วิส จอดเทียบหน้าโครงการ จนถึงการขึ้นบันไดตรวจวัดความเร็วลมขั้นตอนสุดท้าย ทุกขั้นตอนถูกควบคุมด้วยมาตรฐานความสะอาดระดับสูงสุด",
+      videoCaption: "บันทึกการปฏิบัติงานจริง — ทีมช่าง ฮูก แอร์เซอร์วิส",
+      videoSub: "เลื่อนหน้าจอเพื่อดูการทำงานตั้งแต่รถบริการไปจนถึงช่างบนบันได",
+      pillars: [
+        {
+          num: "01",
+          title: "หน่วยรถบริการเคลื่อนที่พร้อมอุปกรณ์ครบมือ",
+          body:
+            "ทีมช่างเดินทางด้วยรถบริการเฉพาะทาง พร้อมปั๊มแรงดันสูงระบบอินเวอร์เตอร์เสียงเงียบ ถังเก็บน้ำเสียระบบปิด และเอกสารลงทะเบียนนิติบุคคลคอนโดครบถ้วน",
+          timecode: "00:00 — เดินทางถึงหน้างาน",
+        },
+        {
+          num: "02",
+          title: "คลุมผ้าใบและปกป้องพื้นที่ภายในห้อง 360 องศา",
+          body:
+            "ก่อนเริ่มถอดน็อตทุกตัว ช่างจะปูแผ่นรองพื้นกันรอย หุ้มแผงวงจรไฟฟ้า (PCB) ด้วยถุงกันน้ำนิรภัย และติดตั้งกรวยผ้าใบรับน้ำเสียเข้าสู่ถังปิดโดยไม่เลอะพื้นห้อง",
+          timecode: "00:15 — ป้องกันพื้นที่",
+        },
+        {
+          num: "03",
+          title: "ถอดล้างลึกบนบันไดเซฟตี้และรับประกัน 30 วัน",
+          body:
+            "ถอดหน้ากาก แผ่นกรอง ถาดน้ำทิ้ง และพัดลมโพรงกระรอกออกมาล้างทำความสะอาด อัดฉีดคอยล์เย็นและท่อน้ำทิ้ง พร้อมรับประกันอาการน้ำหยดนาน 30 วันเต็ม",
+          timecode: "00:30 — ล้างใหญ่เต็มระบบ",
+        },
+      ],
+      metrics: {
+        units: { value: "18,400+", label: "เครื่องที่ผ่านการล้างใหญ่ใน กทม." },
+        warranty: { value: "30 วัน", label: "รับประกันน้ำแอร์หยดและแอร์ไม่เย็น" },
+        compliance: { value: "100%", label: "ผ่านระเบียบนิติบุคคลคอนโดทุกโครงการ" },
+      },
+    },
+    services: {
+      sectionIndex: "02 — บริการของเราและตารางราคามาตรฐาน",
+      heading: "4 มาตรฐานบริการครบวงจร ราคาโปร่งใส",
+      sub:
+        "ออกแบบขั้นตอนการทำงานแยกตามโครงสร้างที่พักอาศัย ทั้งคอนโดมิเนียมอาคารสูง บ้านเดี่ยว และระบบแอร์ฝังฝ้า ไม่มีค่าใช้จ่ายแอบแฝงหน้างาน",
+      bookProtocol: "เลือกจองบริการนี้",
+      matrix: [
+        {
+          num: "01",
+          category: "บริการสำหรับคอนโดมิเนียม",
+          title: "ล้างแอร์คอนโดระบบปิด ไร้หยดน้ำกระเด็น",
+          price: "฿550",
+          unitNote: "/ เครื่อง (2 เครื่องขึ้นไป) • 1 เครื่อง ฿650",
+          description:
+            "ออกแบบเฉพาะสำหรับคอนโดมิเนียมที่มีระเบียงแคบและพื้นไม้ลามิเนต ใช้ปั๊มเสียงเงียบและฉากกั้นคอยล์ร้อนริมระเบียง ไม่รบกวนห้องข้างเคียง",
+          specs: [
+            "ดำเนินการแลกบัตรและเอกสารขออนุญาตทำงานกับนิติบุคคลครบถ้วน",
+            "คลุมกรวยผ้าใบกันน้ำ 360 องศา ต่อท่อลงถังพักน้ำเสียระบบปิด",
+            "กางฉากผ้าใบครอบคอยล์ร้อนริมระเบียง น้ำสกปรกไม่กระเด็นตกตึก",
+            "อัดแรงดันไล่เมือกในท่อน้ำทิ้ง PVC พร้อมรับประกันน้ำหยด 30 วัน",
+          ],
+        },
+        {
+          num: "02",
+          category: "บริการสำหรับบ้านเดี่ยวและทาวน์โฮม",
+          title: "แพ็กเกจล้างแอร์บ้านพักอาศัยครบชุด",
+          price: "฿500",
+          unitNote: "/ เครื่อง (3 เครื่องขึ้นไป) • 1–2 เครื่อง ฿600",
+          description:
+            "จัดทีมช่าง 2 คนเข้าดูแลพร้อมกันสำหรับบ้านพักอาศัย ขจัดคราบฝุ่นสวน คราบไอน้ำมันจากการทำอาหาร และทะลวงท่อน้ำทิ้งยาวถึงรางระบายหลัก",
+          specs: [
+            "ตรวจวัดค่าแคปซิเตอร์ กระแสไฟคอมเพรสเซอร์ และอุณหภูมิ ΔT ก่อนล้าง",
+            "ถอดพัดลมโพรงกระรอกและฉีดโฟมสลายคราบไขมันสำหรับแอร์ห้องโถง",
+            "ฉีดล้างคราบดินโคลนและใบไม้ที่อุดตันแผงคอยล์ร้อนนอกตัวบ้าน",
+            "อัดสายฉีดแรงดันสูงทะลวงท่อน้ำทิ้ง PVC ยาวตลอดแนวถึงรางน้ำ",
+          ],
+        },
+        {
+          num: "03",
+          category: "ระบบแอร์เชิงพาณิชย์และเพนท์เฮาส์",
+          title: "ล้างแอร์สี่ทิศทาง (4-Way Cassette) และแอร์ต่อท่อดักท์",
+          price: "฿1,400",
+          unitNote: "/ เครื่อง (18,000 – 48,000 BTU)",
+          description:
+            "ถอดล้างทำความสะอาดเชิงลึกสำหรับแอร์ฝังฝ้าเพดานสี่ทิศทางและแอร์เปลือยซ่อนฝ้า ในบ้านพักระดับลักชัวรีและโฮมออฟฟิศ",
+          specs: [
+            "ถอดล้างใบพัดเทอร์โบ ถาดรองน้ำทิ้ง และชุดลูกลอยสวิตช์ตัดน้ำ",
+            "ล้างทำความสะอาดปั๊มเดรนน้ำทิ้ง (Condensate Pump) ป้องกันน้ำล้นฝ้า",
+            "ทำความสะอาดหน้ากากกระจายลมและช่องเซอร์วิสฝ้าเพดาน",
+            "ตรวจเช็คแรงดันน้ำยาแอร์ R32 / R410A และระบบไฟฟ้าครบชุด",
+          ],
+        },
+        {
+          num: "04",
+          category: "ฟื้นฟูแอร์ตันสะสมหรือน้ำหยดเรื้อรัง",
+          title: "ล้างใหญ่ฟื้นฟูแกนคอยล์และพ่นฆ่าเชื้อเกรดโรงพยาบาล",
+          price: "฿850",
+          unitNote: "/ เครื่อง (สำหรับแอร์ไม่ออกลมหรือเมือกอุดตันหนัก)",
+          description:
+            "โปรแกรมฟื้นฟูพิเศษสำหรับเครื่องปรับอากาศที่ไม่ได้ล้างนาน มีกลิ่นอับชื้นรุนแรง มีคราบราดำเกาะหนา หรือมีอาการน้ำแอร์หยดลงผนัง",
+          specs: [
+            "ฟอกโฟม pH-Neutral สลายคราบเมือกฝังลึกทั้งด้านหน้าและหลังแผงคอยล์",
+            "อัดไนโตรเจนและน้ำแรงดันสูงเคลียร์ท่อเดรนน้ำทิ้งที่อุดตันเรื้อรัง",
+            "พ่นละอองน้ำยาฆ่าเชื้อแบคทีเรียและสปอร์เชื้อรา Food-Grade",
+            "วัดความเร็วลม (m/s) และอุณหภูมิลมออกเปรียบเทียบก่อน-หลังส่งมอบ",
+          ],
+        },
       ],
     },
     brands: {
-      heading: "ทุกแบรนด์",
-      sub: "มาตรฐานเดียว ปรับให้เข้ากับวิศวกรรมของแต่ละผู้ผลิต",
-      dockLabel: "เลือกแบรนด์แอร์ของคุณ",
-      techLabel: "เทคโนโลยีเด่น",
-      methodLabel: "วิธีที่เราล้าง",
-      pressureLabel: "แรงดันฉีดล้างคอยล์",
-      timeLabel: "เวลาให้บริการ",
+      sectionIndex: "03 — ความเชี่ยวชาญเฉพาะแบรนด์ (13 แบรนด์ชั้นนำ)",
+      heading: "13 แบรนด์ระดับโลก มาตรฐานเดียวที่เหนือกว่า",
+      sub:
+        "เครื่องปรับอากาศแต่ละแบรนด์มีสารเคลือบแผงคอยล์ ชุดปล่อยประจุไอออน และกลไกบานสวิงที่ต่างกัน คลิกเลือกแบรนด์เพื่อดูขั้นตอนการดูแลเฉพาะทางของเรา",
+      dockLabel: "คลิกเลือกแบรนด์เครื่องปรับอากาศเพื่อดูเทคนิคการล้าง",
+      techLabel: "01 / โครงสร้างและเทคโนโลยีเฉพาะแบรนด์",
+      methodLabel: "02 / ขั้นตอนการดูแลโดย ฮูก แอร์เซอร์วิส",
+      pressureLabel: "03 / แรงดันน้ำที่ปรับตั้งเฉพาะคอยล์",
+      timeLabel: "04 / ระยะเวลามาตรฐานต่อเครื่อง",
       minutes: "นาที",
-      preview: "ดูแบบถอดชิ้นส่วน 3 มิติ",
+      preview: "ซิงค์แบรนด์นี้ขึ้นบนโมเดลหลัก",
       profiles: {
         daikin: {
-          tech: "ลมโคอันดะ และระบบฟอกอากาศ Streamer",
-          method: "ถอดบานสวิงโคอันดะและชุด Streamer ออกก่อน แล้วฉีดล้างคอยล์แบบถนอมครีบ",
+          tech: "บานสวิง Coanda Airflow และชุดปล่อยประจุ Streamer",
+          method:
+            "ถอดบานสวิงคู่ Coanda และแยกชุดโมดูล Streamer แรงดันสูงออกก่อนอัดฉีดล้างคอยล์ Blue-Fin ด้วยแรงดัน 120 PSI อย่างปลอดภัย",
         },
         mitsubishi: {
-          tech: "สารเคลือบ Dual Barrier Coating",
-          method: "ใช้โฟม pH เป็นกลางเท่านั้น สารเคลือบกันฝุ่นและคราบมันจึงไม่หลุดลอก",
+          tech: "สารเคลือบ Dual Barrier Coating และโครงสร้างแกะล้างง่าย",
+          method:
+            "ใช้น้ำยา pH เป็นกลางและหัวฉีดมุมพัด 90 PSI เพื่อรักษาชั้นเคลือบฟลูออรีนป้องกันฝุ่นและคราบมัน Dual Barrier Coating ไม่ให้หลุดลอก",
         },
         carrier: {
-          tech: "ระบบล้างคอยล์อัตโนมัติ และไอออนไนเซอร์",
-          method: "ปิดผนึกชุดไอออนไนเซอร์ แล้วล้างคอยล์และถาดน้ำทิ้งส่วนที่ระบบอัตโนมัติล้างไม่ถึง",
+          tech: "ระบบฟอกอากาศ Xpower Gold Ionizer และคอยล์ทำความสะอาดตัวเอง",
+          method:
+            "ซีลปิดชุด Xpower Ionizer กันความชื้น แล้วฉีดล้างด้านหลังแผงคอยล์และรางน้ำทิ้งส่วนลึกที่ระบบล้างอัตโนมัติเข้าไม่ถึง",
         },
         haier: {
-          tech: "ล้างด้วยน้ำแข็ง และฆ่าเชื้อ 56°C",
-          method: "ป้องกันเซ็นเซอร์อุณหภูมิ แล้วชะล้างคราบที่หลุดจากรอบน้ำแข็งออกให้หมด",
+          tech: "ระบบ Frost Self-Clean และฆ่าเชื้อด้วยความร้อน 56°C",
+          method:
+            "หุ้มหัววัดอุณหภูมิ Thermistor ก่อนถอดพัดลมโพรงกระรอกออกมาล้าง และอัดฉีดคราบตะกรันเมือกที่สะสมจากรอบน้ำแข็ง",
         },
         amena: {
-          tech: "คอยล์แบบงานหนักสำหรับบ้านเมืองไทย",
-          method: "ฉีดล้างคอยล์แรงดันเต็มกำลัง เหมาะกับฝุ่นกรุงเทพฯ และท่อน้ำทิ้งยาวในคอนโด",
+          tech: "แผงคอยล์ทองแดงและฟินอะลูมิเนียมงานหนักสำหรับภูมิอากาศเมืองไทย",
+          method:
+            "อัดฉีดล้างเต็มกำลัง 150 PSI ทั้งสองฝั่งคอยล์ ขจัดฝุ่น PM2.5 หนาแน่นและไล่เมือกในท่อน้ำทิ้งคอนโดได้อย่างหมดจด",
         },
         samsung: {
-          tech: "WindFree รูระบายลม 23,000 รู",
-          method: "เคลียร์รูระบายลมด้วยคลื่นอัลตราโซนิก แล้วล้างพัดลมและคอยล์อย่างละเอียด",
+          tech: "หน้ากากกระจายลม WindFree 23,000 Micro-Holes",
+          method:
+            "ถอดแผงหน้ากาก WindFree ออกมาฉีดเคลียร์รูระบายอากาศทั้ง 23,000 รู ให้โล่งสนิท ป้องกันอาการไอน้ำเกาะหน้ากากและลมไม่ออก",
         },
         toshiba: {
-          tech: "สารเคลือบ Magic Coil และแผ่นกรอง Ultra Pure",
-          method: "ล้างแบบถนอมสารเคลือบ และฟื้นฟูแผ่นกรอง ไม่ใช้แปรงขัด",
+          tech: "สารเคลือบ Aqua-Resin Magic Coil และแผ่นกรอง Ultra-Pure",
+          method:
+            "ฉีดล้างด้วยม่านน้ำเรียบไม่ขูดขีดผิว Aqua-Resin Magic Coil พร้อมถอดล้อพัดลมโพรงกระรอกออกมาล้างฆ่าเชื้อนอกตัวเครื่อง",
         },
         tcl: {
-          tech: "คอยล์ครีบฟ้าเคลือบสาร Hydrophilic",
-          method: "ฉีดหัวฉีดตามแนวตรง รักษาชั้นเคลือบไว้ขณะชะคราบสกปรกออก",
+          tech: "แผงคอยล์เคลือบสารไทเทเนียมทอง Titan Gold Fin",
+          method:
+            "เดินหัวฉีดแนวตั้งขนานร่องครีบฟิน ชะล้างคราบฝุ่นเหนียวออกจากแผงคอยล์ Titan Gold โดยครีบอะลูมิเนียมไม่ล้มพับ",
         },
         sharp: {
-          tech: "เครื่องกำเนิดไอออน Plasmacluster",
-          method: "ถอดชุดกำเนิดไอออนออกทำความสะอาดแบบแห้ง แยกล้างคอยล์และพัดลม",
+          tech: "ชุดกำเนิดไอออน Plasmacluster และบานสวิง Coanda ยาวพิเศษ",
+          method:
+            "ถอดตลับเข็มประจุ Plasmacluster ออกมาทำความสะอาดแบบแห้งแยกต่างหาก ก่อนล้างอัดฉีดแผงคอยล์เย็นและถาดน้ำทิ้งเต็มระบบ",
         },
         midea: {
-          tech: "ระบบ Active Clean ล้างด้วยความร้อน",
-          method: "แยกสายเซ็นเซอร์ออกก่อน แล้วล้างคอยล์เย็นและโพรงกระรอกเต็มชุด",
+          tech: "คอยล์ทอง PrimeGuard Golden Fin และระบบ Active Clean",
+          method:
+            "แยกชุดสายไฟและมอเตอร์บานสวิงออกจากโซนเปียก แล้วถอดล้างโพรงกระรอก รางน้ำทิ้งด้านหลัง และแผงคอยล์จนสะอาดใส",
         },
         fujitsu: {
-          tech: "พัดลมขนาดใหญ่ และแผ่นกรอง Apple-catechin",
-          method: "ถอดโพรงกระรอกขนาดใหญ่ออกมาล้างนอกเครื่อง พร้อมฟื้นฟูแผ่นกรอง",
+          tech: "พัดลมโพรงกระรอกขนาดใหญ่พิเศษ และแผ่นกรอง Apple-Catechin",
+          method:
+            "ถอดแกนพัดลมโพรงกระรอกเส้นผ่านศูนย์กลางใหญ่ออกมาล้างคราบฝุ่นฝังแน่น พร้อมทำความสะอาดแผ่นกรอง Apple-Catechin",
         },
         lg: {
-          tech: "DUAL Inverter และคอยล์ Gold Fin",
-          method: "ล้างครีบเคลือบด้วยแรงดันต่ำ แล้ววัดกระแสคอมเพรสเซอร์หลังล้าง",
+          tech: "คอมเพรสเซอร์ DUAL Inverter และแผงคอยล์ Gold Fin™",
+          method:
+            "ล้างด้วยแรงดัน 100 PSI ถนอมชั้นเคลือบป้องกันสนิม Gold Fin™ พร้อมตรวจวัดค่ากระแสไฟ (Amp) ของระบบอินเวอร์เตอร์หลังประกอบเสร็จ",
         },
         panasonic: {
-          tech: "ระบบ nanoe X",
-          method: "ปกป้องโมดูล nanoe X ขณะล้างคอยล์ ถาดน้ำทิ้ง และพัดลมเต็มชุด",
+          tech: "โมดูลปล่อยอนุภาค nanoe™ X และบานสวิงคู่ Aerowings",
+          method:
+            "คลุมป้องกันหัวพ่นอนุภาค nanoe™ X อย่างมิดชิด ก่อนถอดบานสวิงคู่ Aerowings โพรงกระรอก และถาดน้ำทิ้งออกมาล้างฆ่าเชื้อ",
         },
       },
     },
     slider: {
-      heading: "เห็นความต่าง",
-      sub: "ฝุ่นกรุงเทพฯ 6 เดือน เทียบกับการล้างเพียงครั้งเดียว",
-      instruction: "ลากเพื่อเปรียบเทียบ",
+      sectionIndex: "เปรียบเทียบสภาพคอยล์เย็นก่อนและหลังล้าง",
+      heading: "ฝุ่นสะสม 6 เดือนในกรุงเทพฯ สะอาดหมดจดในครั้งเดียว",
+      sub: "ลากแถบแบ่งภาพเพื่อเปรียบเทียบแผงคอยล์ที่อุดตันด้วยเมือกและฝุ่น กับผลลัพธ์หลังล้างอัดฉีด 150 PSI",
+      instruction: "ลากแถบซ้าย-ขวาเพื่อเปรียบเทียบ",
       ariaLabel: "เปรียบเทียบคอยล์แอร์ก่อนและหลังล้าง",
-      before: { label: "ก่อนล้าง", temp: "19.8°C", blockage: "78%", energy: "+34%" },
-      after: { label: "หลังล้าง", temp: "10.5°C", blockage: "0%", energy: "ตามสเปก" },
+      before: {
+        label: "01 / สภาพก่อนล้างใหญ่",
+        temp: "19.8°C",
+        blockage: "78%",
+        energy: "+34%",
+        summary: "เมือกวุ้นและฝุ่น PM2.5 อุดตันครีบคอยล์กว่า 78% ทำให้น้ำแอร์หยด ลมมีกลิ่นอับ และคอมเพรสเซอร์กินไฟหนัก",
+      },
+      after: {
+        label: "02 / หลังล้างอัดฉีด 150 PSI",
+        temp: "10.5°C",
+        blockage: "0%",
+        energy: "ตามสเปกโรงงาน",
+        summary: "ครีบอะลูมิเนียมใสสะอาด โพรงกระรอกไร้ฝุ่นเกาะ ท่อน้ำทิ้งโล่งสนิท คืนลมเย็นฉ่ำบริสุทธิ์ทันที",
+      },
       tempLabel: "อุณหภูมิลมออก",
-      blockageLabel: "ครีบอุดตัน",
-      energyLabel: "การกินไฟ",
+      blockageLabel: "การอุดตันของครีบ",
+      energyLabel: "อัตราการกินไฟ",
     },
     explorer: {
-      heading: "คอนโด. บ้าน.",
-      sub: "ที่พักต่างกัน ขั้นตอนต่างกัน",
-      from: "เริ่มต้น",
+      heading: "ขั้นตอนที่ออกแบบเฉพาะสำหรับคอนโดและบ้านเดี่ยว",
+      sub: "สลับดูระเบียบการปฏิบัติงานระหว่างคอนโดมิเนียมอาคารสูงและบ้านพักอาศัย",
+      from: "อัตราค่าบริการสุทธิเริ่มต้น",
       perUnit: "/ เครื่อง",
-      book: "จองขั้นตอนนี้",
+      book: "จองแพ็กเกจนี้",
       profiles: {
         condo: {
-          tab: "คอนโด",
-          line: "ประสานนิติฯ ปั๊มเสียงเงียบ พื้นแห้งสนิท",
+          tab: "01 / คอนโดมิเนียม",
+          line: "ดูแลเอกสารนิติบุคคล ปั๊มอินเวอร์เตอร์เสียงเงียบ พื้นห้องแห้งสะอาด 100%",
           price: "฿550",
-          duration: "45–60 นาที ต่อเครื่อง",
-          units: "2 เครื่องขึ้นไป",
+          duration: "45–60 นาที / เครื่อง",
+          units: "แพ็กเกจ 2 เครื่องขึ้นไป",
           steps: [
-            { title: "ปิดคลุมมิดชิด", line: "ปูแผ่นรองพื้น หุ้มแผงวงจร ต่อถังน้ำเสียระบบปิด" },
-            { title: "ถอดโพรงกระรอก", line: "ถอดโพรงกระรอกและถาดน้ำทิ้งออกมาล้างนอกเครื่อง" },
-            { title: "กั้นระเบียง", line: "ครอบคอยล์ร้อน ไม่มีน้ำกระเด็นใส่ห้องข้างเคียง" },
-            { title: "ตรวจวัดผล", line: "วัดอุณหภูมิลมและกระแสไฟ ส่งรายงานเข้า LINE" },
+            { title: "คลุมกันเปื้อนระบบปิด", line: "ปูแผ่นรองพื้น หุ้มแผงวงจร PCB และต่อกรวยน้ำเสียลงถังปิดมิดชิด" },
+            { title: "ถอดล้างโพรงกระรอก", line: "ถอดพัดลมโพรงกระรอกและถาดน้ำทิ้งออกมาล้างคราบดำนอกตัวเครื่อง" },
+            { title: "กั้นคอยล์ร้อนริมระเบียง", line: "กางผ้าใบครอบคอยล์ร้อน น้ำสกปรกไม่กระเด็นเลอะห้องข้างเคียง" },
+            { title: "ตรวจวัดผลดิจิทัล", line: "วัดอุณหภูมิลมออกและกระแสไฟ พร้อมส่งรายงานเข้า LINE ลูกค้า" },
           ],
         },
         house: {
-          tab: "บ้าน",
-          line: "ทีมช่าง 2 คน ล้างได้ถึง 8 เครื่องในครั้งเดียว",
+          tab: "02 / บ้านเดี่ยวและทาวน์โฮม",
+          line: "ทีมช่าง 2 คนเข้าปฏิบัติงานพร้อมกัน รองรับสูงสุด 8 เครื่องภายในวันเดียว",
           price: "฿500",
-          duration: "40–50 นาที ต่อเครื่อง",
-          units: "3 เครื่องขึ้นไป",
+          duration: "40–50 นาที / เครื่อง",
+          units: "แพ็กเกจ 3 เครื่องขึ้นไป",
           steps: [
-            { title: "ตรวจสุขภาพ", line: "วัดแคปซิเตอร์ กระแสไฟ และ ΔT ทุกเครื่อง" },
-            { title: "ล้างลึก", line: "ฉีดล้างคอยล์ 150 PSI พร้อมโฟมสลายคราบมัน" },
-            { title: "ฟื้นคอยล์ร้อน", line: "ล้างคอยล์ร้อนนอกบ้าน ทะลวงท่อน้ำทิ้งถึงรางระบาย" },
-            { title: "ฆ่าเชื้อ", line: "พ่นน้ำยาฆ่าเชื้อ ตรวจแรงดันน้ำยาแอร์" },
+            { title: "ตรวจเช็คสุขภาพแอร์", line: "วัดค่าแคปซิเตอร์ กระแสไฟคอมเพรสเซอร์ และ ΔT ทุกเครื่องก่อนล้าง" },
+            { title: "อัดฉีดคอยล์ 150 PSI", line: "ฉีดล้างคอยล์เย็นสองด้าน พร้อมโฟมสลายคราบไอน้ำมันจากห้องครัว" },
+            { title: "ล้างคอยล์ร้อนในสวน", line: "ชะล้างคราบดินโคลนและใบไม้ที่คอยล์ร้อน พร้อมทะลวงท่อน้ำทิ้ง PVC" },
+            { title: "พ่นฆ่าเชื้อและเช็คน้ำยา", line: "พ่นสเปรย์ฆ่าเชื้อโรคและตรวจวัดแรงดันน้ำยาแอร์ R32/R410A" },
           ],
         },
       },
     },
-    closing: {
-      title: "หายใจเต็มปอด",
-      sub: "จองใน 30 วินาที ชำระเงินหลังล้างเสร็จ",
-      cta: "จองคิวล้างแอร์",
-      line: "แชทผ่าน LINE",
+    contact: {
+      sectionIndex: "04 — ติดต่อเราและศูนย์จัดส่งทีมช่าง",
+      heading: "พร้อมจัดส่งทีมช่างทั่วกรุงเทพฯ และปริมณฑล",
+      sub:
+        "ติดต่อฝ่ายจัดคิวงานได้โดยตรงทางโทรศัพท์ แชทผ่าน LINE Official หรือคำนวณราคาออนไลน์ ฟรีค่าเดินทางทั่วกรุงเทพฯ นนทบุรี ปทุมธานี และสมุทรปราการ",
+      phoneTitle: "01 / สายด่วนจัดคิวช่าง",
+      phonePrimary: "092-420-0043",
+      phoneSecondary: "098-364-9865",
+      phoneNote: "นัดหมายคิวงานด่วน และประสานงานเอกสารนิติบุคคลคอนโดมิเนียม",
+      lineTitle: "02 / จองคิวผ่าน LINE OFFICIAL",
+      lineHandle: "@airconpro.th",
+      lineNote: "ส่งภาพหน้างาน ขอใบเสนอราคาหลายเครื่อง หรือจองคิวภายใน 3 นาที",
+      hoursTitle: "03 / เวลาทำการ",
+      hoursValue: "08:00 – 20:00 น. ทุกวัน",
+      hoursSub: "เปิดให้บริการทุกวัน จันทร์ – อาทิตย์ ไม่เว้นวันหยุดนักขัตฤกษ์",
+      coverageTitle: "04 / พื้นที่ให้บริการฟรีค่าเดินทาง",
+      coverageSub: "สุขุมวิท • สาทร • สีลม • พระราม 9 • รัชดา • อารีย์ • จตุจักร • บางนา • ศรีนครินทร์ • ธนบุรี • นนทบุรี",
+      primaryCta: "เปิดหน้าต่างคำนวณราคาและจองคิว",
+      lineCta: "ทักแชท LINE Official",
     },
     serviceArea: {
       zones: [
@@ -638,7 +1021,7 @@ const translations: Record<Language, Translations> = {
       hoursLabel: "เวลาทำการจัดส่งทีมช่าง",
       hoursValue: "08:00 – 20:00 น. (เปิดบริการทุกวัน ไม่เว้นวันหยุดนักขัตฤกษ์)",
       licenseText: "ทีมช่างผ่านการรับรองมาตรฐานฝีมือแรงงานแห่งชาติ • ออกใบกำกับภาษีเต็มรูปแบบได้",
-      copyright: "© 2026 บริษัท ฮุค แอร์ เซอร์วิส จำกัด สงวนลิขสิทธิ์",
+      copyright: "© 2026 บริษัท ฮูก แอร์เซอร์วิส จำกัด (Hook Air Service Co., Ltd.) สงวนลิขสิทธิ์",
     },
   },
 };
