@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
+import { useScroll, useSpring } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { BRANDS, getBrand, type BrandId } from "@/lib/brands";
 import { BrandLogo } from "@/components/BrandLogos";
@@ -20,9 +21,24 @@ export function BrandMasteryShowcase({
   const selected = getBrand(activeBrand);
   const profile = t.brands.profiles[activeBrand];
 
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  // Track scroll into the Brands section: 0 (Assembled) -> 1 (Scattered/Exploded)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 75%", "center center"],
+  });
+
+  const scrollExplodeProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 26,
+    mass: 0.35,
+  });
+
   return (
     <section
       id="brands"
+      ref={sectionRef}
       className="py-24 lg:py-32 bg-[#F8FAFC] border-t border-slate-200/80 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,7 +152,7 @@ export function BrandMasteryShowcase({
             </div>
           </div>
 
-          {/* RIGHT COLUMN (6 cols): Interactive 5-Layer Exploded/Assembled Aircon Rig */}
+          {/* RIGHT COLUMN (6 cols): Scroll-Triggered Assembled -> Scattered Aircon Rig */}
           <div className="lg:col-span-6">
             <InteractiveAirconRig
               selectedBrandId={selected.id}
@@ -145,6 +161,7 @@ export function BrandMasteryShowcase({
               psi={selected.psi}
               panel={selected.panel}
               louver={selected.louver}
+              scrollExplodeProgress={scrollExplodeProgress}
             />
           </div>
         </div>

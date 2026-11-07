@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence, useScroll } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import type { BrandId } from "@/lib/brands";
 import { SmoothScrollVideo } from "@/components/SmoothScrollVideo";
@@ -17,9 +17,6 @@ const HERO_VIDEO_SOURCES = [
   "/ACBG2.mp4",
 ];
 
-// 0: 0.00-0.24 ("Exposed."), 1: 0.25-0.49 ("150 PSI."), 2: 0.50-0.74 ("Aligned."), 3: 0.75-0.79 ("Pure Air."), 4: 0.80-1.00 ("Pure Air." + CTA)
-const HERO_STAGE_THRESHOLDS = [0, 0.25, 0.5, 0.75, 0.8];
-
 const HERO_WORDS = {
   en: ["Exposed.", "150 PSI.", "Aligned.", "Pure Air."],
   th: ["ถอดลึกทุกชิ้นส่วน", "ฉีดล้างแรงดันสูง", "ประกอบปราณีต", "ความเย็นบริสุทธิ์"],
@@ -31,21 +28,46 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const progressFillRef = useRef<HTMLDivElement | null>(null);
 
-  // Discrete stage index (0..4) updated only when crossing thresholds
-  const [stageIndex, setStageIndex] = useState<number>(0);
-
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  const handleStageChange = useCallback((nextStage: number) => {
-    setStageIndex(nextStage);
-  }, []);
+  // Continuous anti-flicker opacity, Y, and scale curves (zero React re-renders or DOM unmounts)
+  // Beat 1 (0.00 - 0.24): "Exposed."
+  const b1Opacity = useTransform(scrollYProgress, [0, 0.18, 0.24], [1, 1, 0]);
+  const b1Y = useTransform(scrollYProgress, [0, 0.18, 0.24], [0, 0, -18]);
+  const b1Scale = useTransform(scrollYProgress, [0, 0.18, 0.24], [1, 1, 0.96]);
 
-  const wordIndex = Math.min(3, stageIndex);
-  const currentWord = HERO_WORDS[language][wordIndex];
-  const showFinalCta = stageIndex >= 4;
+  // Beat 2 (0.25 - 0.49): "150 PSI."
+  const b2Opacity = useTransform(scrollYProgress, [0.22, 0.28, 0.44, 0.5], [0, 1, 1, 0]);
+  const b2Y = useTransform(scrollYProgress, [0.22, 0.28, 0.44, 0.5], [18, 0, 0, -18]);
+  const b2Scale = useTransform(scrollYProgress, [0.22, 0.28, 0.44, 0.5], [0.95, 1, 1, 0.96]);
+
+  // Beat 3 (0.50 - 0.74): "Aligned."
+  const b3Opacity = useTransform(scrollYProgress, [0.47, 0.53, 0.69, 0.75], [0, 1, 1, 0]);
+  const b3Y = useTransform(scrollYProgress, [0.47, 0.53, 0.69, 0.75], [18, 0, 0, -18]);
+  const b3Scale = useTransform(scrollYProgress, [0.47, 0.53, 0.69, 0.75], [0.95, 1, 1, 0.96]);
+
+  // Beat 4 (0.75 - 1.00): "Pure Air."
+  const b4Opacity = useTransform(scrollYProgress, [0.72, 0.79, 1], [0, 1, 1]);
+  const b4Y = useTransform(scrollYProgress, [0.72, 0.79, 1], [18, 0, 0]);
+  const b4Scale = useTransform(scrollYProgress, [0.72, 0.79, 1], [0.95, 1, 1]);
+
+  // Final Beat CTA (0.80 - 1.00)
+  const ctaOpacity = useTransform(scrollYProgress, [0.78, 0.85, 1], [0, 1, 1]);
+  const ctaY = useTransform(scrollYProgress, [0.78, 0.85, 1], [14, 0, 0]);
+  const ctaPointerEvents = useTransform(scrollYProgress, (v) =>
+    v >= 0.78 ? "auto" : "none"
+  );
+
+  const words = HERO_WORDS[language];
+  const beatTransforms = [
+    { opacity: b1Opacity, y: b1Y, scale: b1Scale },
+    { opacity: b2Opacity, y: b2Y, scale: b2Scale },
+    { opacity: b3Opacity, y: b3Y, scale: b3Scale },
+    { opacity: b4Opacity, y: b4Y, scale: b4Scale },
+  ];
 
   return (
     <section
@@ -54,16 +76,14 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
       aria-label="Scroll-Scrubbed Aircon Hero"
       className="relative h-[400vh] w-full bg-[#0F172A] text-white select-none"
     >
-      {/* Full-Viewport Sticky Stage */}
-      <div className="sticky top-16 h-[calc(100vh-4rem)] sm:h-[calc(100dvh-4rem)] w-full overflow-hidden flex flex-col justify-end items-center pb-12 sm:pb-16 px-4">
-        {/* 1. 100% Full-Bleed Scroll-Scrubbed Video (Zero Procedural Schematics) */}
+      {/* Full-Viewport Sticky Stage (100% Edge-to-Edge Behind Transparent Navbar) */}
+      <div className="sticky top-0 h-screen sm:h-dvh w-full overflow-hidden flex flex-col justify-end items-center pb-14 sm:pb-20 px-4">
+        {/* 1. 100% Full-Bleed Scroll-Scrubbed Video (Zero Blinking, Persistent Canvas Buffer) */}
         <SmoothScrollVideo
           sources={HERO_VIDEO_SOURCES}
           scrollYProgress={scrollYProgress}
           lerpFactor={0.18}
           canvasFilter="contrast(1.05) saturate(1.04)"
-          stageThresholds={HERO_STAGE_THRESHOLDS}
-          onStageChange={handleStageChange}
           progressFillRef={progressFillRef}
           className="pointer-events-none absolute inset-0 w-full h-full"
         />
@@ -74,39 +94,44 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#0F172A]/80 via-[#0F172A]/25 to-transparent"
         />
 
-        {/* 2. Single High-Impact Changing Kinetic Word + Final Beat CTA */}
-        <div className="relative z-10 flex flex-col items-center text-center">
-          <AnimatePresence mode="wait">
-            <motion.h1
-              key={`${language}-${wordIndex}`}
-              initial={{ opacity: 0, y: 18, scale: 0.94 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -14, scale: 1.03 }}
-              transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-              className="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight text-white drop-shadow-[0_8px_32px_rgba(15,23,42,0.75)]"
-            >
-              {currentWord}
-            </motion.h1>
-          </AnimatePresence>
-
-          <div className="h-16 mt-5 flex items-center justify-center">
-            <AnimatePresence>
-              {showFinalCta && (
-                <motion.button
-                  key="hero-final-cta"
-                  type="button"
-                  onClick={onOpenBooking}
-                  initial={{ opacity: 0, y: 12, scale: 0.92 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="px-8 py-3.5 rounded-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-sm sm:text-base tracking-tight shadow-[0_0_32px_rgba(250,204,21,0.45)] transition-colors cursor-pointer"
-                >
-                  {language === "en" ? "Book Now" : "จองคิวล้างแอร์"}
-                </motion.button>
-              )}
-            </AnimatePresence>
+        {/* 2. Continuous Anti-Flicker Kinetic Word Beats (Mounted Permanently, GPU-Driven) */}
+        <div className="relative z-10 flex flex-col items-center text-center w-full max-w-4xl">
+          <div className="relative h-24 sm:h-28 lg:h-32 w-full flex items-center justify-center">
+            {words.map((word, idx) => (
+              <motion.h1
+                key={idx}
+                style={{
+                  opacity: beatTransforms[idx].opacity,
+                  y: beatTransforms[idx].y,
+                  scale: beatTransforms[idx].scale,
+                  willChange: "transform, opacity",
+                  backfaceVisibility: "hidden",
+                }}
+                className="pointer-events-none absolute inset-x-0 text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight text-white drop-shadow-[0_8px_32px_rgba(15,23,42,0.75)]"
+              >
+                {word}
+              </motion.h1>
+            ))}
           </div>
+
+          <motion.div
+            style={{
+              opacity: ctaOpacity,
+              y: ctaY,
+              pointerEvents: ctaPointerEvents,
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
+            }}
+            className="h-14 mt-3 flex items-center justify-center"
+          >
+            <button
+              type="button"
+              onClick={onOpenBooking}
+              className="px-8 py-3.5 rounded-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-sm sm:text-base tracking-tight shadow-[0_0_32px_rgba(250,204,21,0.45)] transition-colors cursor-pointer"
+            >
+              {language === "en" ? "Book Now" : "จองคิวล้างแอร์"}
+            </button>
+          </motion.div>
         </div>
 
         {/* 3. Whisper-Quiet Bottom Edge Scroll Line Indicator */}

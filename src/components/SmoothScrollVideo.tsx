@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import type { MotionValue } from "framer-motion";
 
 export interface SmoothScrollVideoProps {
@@ -32,11 +32,11 @@ export interface SmoothScrollVideoProps {
 }
 
 /**
- * High-performance 60FPS Scroll-Scrubbed Video Engine:
- * 1. Immediately primes frame 0 and fetches the MP4 into an in-memory Blob (URL.createObjectURL) to eliminate disk/HTTP Range latency.
- * 2. Runs a single decoupled requestAnimationFrame loop (zero React useState on scroll).
- * 3. Smoothly interpolates video.currentTime using Lerp (0.18) guarded by !video.seeking.
- * 4. Composites decoded frames onto an HTML5 <canvas> with object-cover geometry and will-change: transform.
+ * Zero-Blink 60FPS Scroll-Scrubbed Video Engine:
+ * 1. Keeps <video> off-screen (1x1px opacity-0) so hardware decoding stays active without native surface flicker.
+ * 2. Sets canvas.width / canvas.height ONLY on mount, loadedmetadata, and window resize — never inside rAF.
+ * 3. Never calls clearRect() or overwrites the canvas once the first video frame is painted; previous frame persists across seeks.
+ * 4. Immediately paints Frame 0 on loadeddata / seeked.
  */
 export function SmoothScrollVideo({
   sources,
@@ -56,11 +56,72 @@ export function SmoothScrollVideo({
 
   // Mutable refs accessed inside rAF so scroll never triggers React re-renders
   const isVideoReadyRef = useRef<boolean>(false);
+  const hasPaintedFirstFrameRef = useRef<boolean>(false);
+  const canvasCssSizeRef = useRef<{ w: number; h: number }>({ w: 1920, h: 1080 });
   const isPlayingContinuousRef = useRef<boolean>(isPlayingContinuous);
   const lastStageRef = useRef<number>(-1);
   const onStageChangeRef = useRef(onStageChange);
   const stageThresholdsRef = useRef(stageThresholds);
   const renderFallbackRef = useRef(renderFallback);
+
+  const paintVideoFrameToCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const vid = videoRef.current;
+    if (!canvas || !vid || vid.readyState < 2) return;
+
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
+
+    const cw = canvasCssSizeRef.current.w;
+    const ch = canvasCssSizeRef.current.h;
+    if (cw <= 0 || ch <= 0) return;
+
+    const vw = vid.videoWidth || 1920;
+    const vh = vid.videoHeight || 1080;
+    const canvasRatio = cw / ch;
+    const videoRatio = vw / vh;
+
+    let sx = 0;
+    let sy = 0;
+    let sw = vw;
+    let sh = vh;
+
+    if (canvasRatio > videoRatio) {
+      sh = vw / canvasRatio;
+      sy = (vh - sh) * 0.5;
+    } else {
+      sw = vh * canvasRatio;
+      sx = (vw - sw) * 0.5;
+    }
+
+    // Persistent paint: draw directly over the existing buffer without clearRect()
+    ctx.drawImage(vid, sx, sy, sw, sh, 0, 0, cw, ch);
+    hasPaintedFirstFrameRef.current = true;
+  }, []);
+
+  const syncCanvasDimensions = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    const cssW = Math.max(1, rect.width);
+    const cssH = Math.max(1, rect.height);
+    canvasCssSizeRef.current = { w: cssW, h: cssH };
+
+    const targetW = Math.max(1, Math.floor(cssW * dpr));
+    const targetH = Math.max(1, Math.floor(cssH * dpr));
+
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Immediately repaint current frame after resize so the buffer never blinks
+      paintVideoFrameToCanvas();
+    }
+  }, [paintVideoFrameToCanvas]);
 
   useEffect(() => {
     isPlayingContinuousRef.current = isPlayingContinuous;
@@ -132,75 +193,30 @@ export function SmoothScrollVideo({
     };
   }, [sources]);
 
-  // 2. Decoupled 60FPS requestAnimationFrame Lerp + Canvas Compositor Loop
+  // 2. Decoupled 60FPS requestAnimationFrame Lerp + Persistent Canvas Paint Loop
   useEffect(() => {
     let rafId = 0;
     let smoothedProgress = Math.max(0, Math.min(1, scrollYProgress.get()));
     let smoothedTime = 0;
     let continuousFallbackProgress = 0;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas ? canvas.getContext("2d", { alpha: false }) : null;
-
-    const handleResize = () => {
-      if (!canvas || !ctx) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const rect = canvas.getBoundingClientRect();
-      const targetW = Math.max(1, Math.floor(rect.width * dpr));
-      const targetH = Math.max(1, Math.floor(rect.height * dpr));
-      if (canvas.width !== targetW || canvas.height !== targetH) {
-        canvas.width = targetW;
-        canvas.height = targetH;
-      }
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    const drawVideoCover = (
-      context: CanvasRenderingContext2D,
-      video: HTMLVideoElement,
-      cw: number,
-      ch: number
-    ) => {
-      const vw = video.videoWidth || 1920;
-      const vh = video.videoHeight || 1080;
-      const canvasRatio = cw / ch;
-      const videoRatio = vw / vh;
-
-      let sx = 0;
-      let sy = 0;
-      let sw = vw;
-      let sh = vh;
-
-      if (canvasRatio > videoRatio) {
-        sh = vw / canvasRatio;
-        sy = (vh - sh) * 0.5;
-      } else {
-        sw = vh * canvasRatio;
-        sx = (vw - sw) * 0.5;
-      }
-
-      context.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
-    };
+    syncCanvasDimensions();
+    window.addEventListener("resize", syncCanvasDimensions);
 
     const tick = () => {
       const rawProgress = Math.max(0, Math.min(1, scrollYProgress.get()));
       smoothedProgress += (rawProgress - smoothedProgress) * lerpFactor;
 
       const vid = videoRef.current;
-      const hasValidVideo =
+      const hasLoadedMetadata =
         vid !== null &&
         isVideoReadyRef.current &&
-        vid.readyState >= 2 &&
         Number.isFinite(vid.duration) &&
         vid.duration > 0;
 
-      // Update optional progress bar / percentage DOM nodes directly (Zero React re-renders)
       let displayProgress = smoothedProgress;
       if (isPlayingContinuousRef.current) {
-        if (hasValidVideo && vid) {
+        if (hasLoadedMetadata && vid) {
           displayProgress = vid.currentTime / vid.duration;
         } else {
           continuousFallbackProgress = (continuousFallbackProgress + 0.0022) % 1;
@@ -215,7 +231,6 @@ export function SmoothScrollVideo({
         progressTextRef.current.textContent = `${Math.round(displayProgress * 100)}%`;
       }
 
-      // Notify stage change listener ONLY when crossing a threshold
       if (stageThresholdsRef.current && onStageChangeRef.current) {
         const thresholds = stageThresholdsRef.current;
         let nextStage = 0;
@@ -230,8 +245,7 @@ export function SmoothScrollVideo({
         }
       }
 
-      // Scrub video.currentTime with Lerp + !video.seeking guard
-      if (hasValidVideo && vid) {
+      if (hasLoadedMetadata && vid) {
         if (!isPlayingContinuousRef.current) {
           const targetTime = rawProgress * vid.duration;
           smoothedTime += (targetTime - smoothedTime) * lerpFactor;
@@ -248,17 +262,20 @@ export function SmoothScrollVideo({
           }
         }
 
-        if (canvas && ctx) {
-          const rect = canvas.getBoundingClientRect();
-          drawVideoCover(ctx, vid, rect.width, rect.height);
+        // Only draw when readyState >= 2; if seeking, keep previous canvas buffer untouched (zero blink!)
+        if (vid.readyState >= 2) {
+          paintVideoFrameToCanvas();
         }
-      } else if (canvas && ctx) {
-        const rect = canvas.getBoundingClientRect();
-        if (renderFallbackRef.current) {
-          renderFallbackRef.current(ctx, rect.width, rect.height, displayProgress);
-        } else {
-          ctx.fillStyle = "#0F172A";
-          ctx.fillRect(0, 0, rect.width, rect.height);
+      } else if (!hasPaintedFirstFrameRef.current && renderFallbackRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas ? canvas.getContext("2d", { alpha: false }) : null;
+        if (ctx) {
+          renderFallbackRef.current(
+            ctx,
+            canvasCssSizeRef.current.w,
+            canvasCssSizeRef.current.h,
+            displayProgress
+          );
         }
       }
 
@@ -269,13 +286,20 @@ export function SmoothScrollVideo({
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", syncCanvasDimensions);
     };
-  }, [scrollYProgress, lerpFactor, progressFillRef, progressTextRef]);
+  }, [
+    scrollYProgress,
+    lerpFactor,
+    progressFillRef,
+    progressTextRef,
+    syncCanvasDimensions,
+    paintVideoFrameToCanvas,
+  ]);
 
   return (
     <div className={className} style={{ willChange: "transform" }}>
-      {/* Hidden In-Memory Video Decoder */}
+      {/* Off-Screen 1x1px Hardware-Active Video Decoder (Never flashes black) */}
       <video
         ref={videoRef}
         muted
@@ -283,6 +307,7 @@ export function SmoothScrollVideo({
         preload="auto"
         onLoadedMetadata={(e) => {
           isVideoReadyRef.current = true;
+          syncCanvasDimensions();
           try {
             if (e.currentTarget.currentTime === 0) {
               e.currentTarget.currentTime = 0.001;
@@ -293,26 +318,32 @@ export function SmoothScrollVideo({
         }}
         onLoadedData={() => {
           isVideoReadyRef.current = true;
+          paintVideoFrameToCanvas();
+        }}
+        onSeeked={() => {
+          paintVideoFrameToCanvas();
         }}
         onCanPlay={() => {
           isVideoReadyRef.current = true;
+          paintVideoFrameToCanvas();
         }}
         onError={() => {
           isVideoReadyRef.current = false;
         }}
-        className="hidden"
+        className="fixed top-0 left-0 w-px h-px opacity-0 pointer-events-none -z-50"
         aria-hidden="true"
       />
 
-      {/* Hardware-Accelerated 60FPS Frame Canvas */}
+      {/* Double-Buffered Persistent Paint Canvas */}
       <canvas
         ref={canvasRef}
         style={{
           filter: canvasFilter,
           willChange: "transform",
           transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
         }}
-        className="block w-full h-full pointer-events-none"
+        className="block w-full h-full pointer-events-none bg-[#0F172A]"
       />
     </div>
   );

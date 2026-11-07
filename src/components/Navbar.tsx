@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface NavbarProps {
@@ -14,13 +14,15 @@ type SectionId = (typeof NAV_SECTIONS)[number];
 
 export function Navbar({ onOpenBooking }: NavbarProps) {
   const { language, setLanguage, t } = useLanguage();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navExpanded, setNavExpanded] = useState<boolean>(false);
   const [activeSection, setActiveSection] = useState<SectionId>("home");
+  const lastScrollYRef = useRef<number>(0);
 
-  // Track active section on scroll
+  // Track active section on scroll and auto-collapse expanded menu when user scrolls
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 180;
+      const currentY = window.scrollY;
+      const scrollPos = currentY + 180;
       let current: SectionId = "home";
 
       for (const id of NAV_SECTIONS) {
@@ -30,6 +32,11 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
         }
       }
       setActiveSection(current);
+
+      if (Math.abs(currentY - lastScrollYRef.current) > 45) {
+        setNavExpanded(false);
+        lastScrollYRef.current = currentY;
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -45,67 +52,46 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
     { id: "contact", label: t.nav.contact, href: "#contact" },
   ];
 
+  const handleToggleNav = () => {
+    lastScrollYRef.current = window.scrollY;
+    setNavExpanded((prev) => !prev);
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full h-16 bg-white/90 backdrop-blur-md border-b border-[#BAE6FD]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Left: Official Hook Air Service Brand Identity + Typographic Lockup */}
+    <header className="fixed top-0 inset-x-0 z-40 w-full bg-transparent border-transparent shadow-none pointer-events-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-5 flex items-center justify-between gap-4">
+        {/* Left: Clean Brand Logo Lockup Floating Over Unobstructed Video */}
         <a
           href="#home"
-          className="flex items-center gap-3 group focus:outline-none shrink-0"
+          className="pointer-events-auto inline-flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-950/45 backdrop-blur-md border border-white/15 group focus:outline-none shrink-0 transition-colors hover:bg-slate-950/65"
         >
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#FACC15] bg-[#0F172A] shrink-0 transition-transform duration-200 group-hover:scale-105">
+          <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#FACC15] bg-[#0F172A] shrink-0 transition-transform duration-200 group-hover:scale-105">
             <Image
               src="/logo.png"
               alt="Hook Air Service (ฮูก แอร์เซอร์วิส) Official Logo"
-              width={40}
-              height={40}
+              width={36}
+              height={36}
               className="w-full h-full object-cover"
               priority
             />
           </div>
-          <div className="flex flex-col">
-            <span className="font-extrabold text-sm sm:text-base tracking-tight text-[#0F172A] leading-none">
+          <div className="flex flex-col pr-1.5">
+            <span className="font-extrabold text-xs sm:text-sm tracking-tight text-white leading-none">
               {t.nav.brandName}
             </span>
-            <span className="text-[11px] font-semibold text-[#0369A1] mt-1 leading-none">
+            <span className="text-[10px] font-bold text-[#FACC15] mt-0.5 leading-none">
               {t.nav.brandSub}
             </span>
           </div>
         </a>
 
-        {/* Center Navigation Links (Smooth scroll + active state hairline indicator) */}
-        <nav
-          aria-label="Primary Executive Navigation"
-          className="hidden lg:flex items-center gap-1 xl:gap-2"
-        >
-          {navLinks.map((item) => {
-            const isActive = activeSection === item.id;
-            return (
-              <a
-                key={item.id}
-                href={item.href}
-                className={`relative px-3.5 py-2 text-xs font-extrabold uppercase tracking-wider transition-colors ${
-                  isActive
-                    ? "text-[#0284C7]"
-                    : "text-[#334155] hover:text-[#0F172A]"
-                }`}
-              >
-                <span>{item.label}</span>
-                {isActive && (
-                  <span className="absolute left-3.5 right-3.5 bottom-0.5 h-0.5 bg-[#0284C7] rounded-full" />
-                )}
-              </a>
-            );
-          })}
-        </nav>
-
-        {/* Right Controls: Segmented EN | TH, Discrete Staff Portal, Yellow Pill CTA */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5">
+        {/* Right: Floating Glassmorphic Controls (EN | TH Switcher + Navbar Toggle Button) */}
+        <div className="pointer-events-auto flex items-center gap-2 sm:gap-2.5">
           {/* Segmented EN | TH Switcher */}
           <div
             role="group"
             aria-label={t.nav.langSwitchLabel}
-            className="inline-flex items-center bg-[#F8FAFC] p-0.5 rounded-full border border-[#BAE6FD]"
+            className="inline-flex items-center bg-slate-950/55 backdrop-blur-xl p-1 rounded-full border border-white/15"
           >
             <button
               type="button"
@@ -113,8 +99,8 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
               aria-pressed={language === "en"}
               className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold tracking-wider transition-colors cursor-pointer ${
                 language === "en"
-                  ? "bg-[#0F172A] text-white"
-                  : "text-[#475569] hover:text-[#0F172A]"
+                  ? "bg-[#FACC15] text-[#0F172A]"
+                  : "text-white/80 hover:text-white"
               }`}
             >
               EN
@@ -125,98 +111,109 @@ export function Navbar({ onOpenBooking }: NavbarProps) {
               aria-pressed={language === "th"}
               className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold tracking-wider transition-colors cursor-pointer ${
                 language === "th"
-                  ? "bg-[#0F172A] text-white"
-                  : "text-[#475569] hover:text-[#0F172A]"
+                  ? "bg-[#FACC15] text-[#0F172A]"
+                  : "text-white/80 hover:text-white"
               }`}
             >
               TH
             </button>
           </div>
 
-          {/* Discrete Staff Portal (/login) Text Link */}
-          <Link
-            href="/login"
-            className="hidden md:inline-block text-xs font-bold text-[#475569] hover:text-[#0284C7] transition-colors px-2 py-1"
-          >
-            {t.nav.staffPortal}
-          </Link>
-
-          {/* High-Contrast Yellow Pill CTA Button */}
+          {/* Sleek Floating Glassmorphic Navigation Toggle Pill */}
           <button
             type="button"
-            onClick={onOpenBooking}
-            className="hidden sm:inline-flex items-center justify-center px-5 py-2 rounded-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-xs tracking-wide uppercase transition-colors cursor-pointer shadow-2xs"
-          >
-            {t.nav.bookService}
-          </button>
-
-          {/* Minimal Typographic Mobile Menu Trigger */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-expanded={mobileMenuOpen}
+            onClick={handleToggleNav}
+            aria-expanded={navExpanded}
             aria-label="Toggle navigation menu"
-            className="lg:hidden px-3 py-1.5 rounded-full border border-[#BAE6FD] text-[11px] font-mono font-extrabold uppercase tracking-wider text-[#0F172A] hover:bg-[#E0F2FE] transition-colors cursor-pointer"
+            className={`px-4 py-2 rounded-full backdrop-blur-xl border text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-2.5 transition-all cursor-pointer ${
+              navExpanded
+                ? "bg-[#FACC15] text-[#0F172A] border-[#FACC15] shadow-[0_0_24px_rgba(250,204,21,0.4)]"
+                : "bg-slate-950/55 text-white border-white/15 hover:border-[#FACC15]/70 hover:bg-slate-950/75"
+            }`}
           >
-            {mobileMenuOpen ? "CLOSE" : "MENU"}
+            <span>
+              {navExpanded
+                ? language === "en"
+                  ? "Close"
+                  : "ปิดเมนู"
+                : language === "en"
+                ? "Menu"
+                : "เมนู"}
+            </span>
+            <span
+              aria-hidden="true"
+              className="w-3.5 h-2.5 flex flex-col justify-between"
+            >
+              <span
+                className={`block h-0.5 w-full rounded-full transition-transform duration-200 ${
+                  navExpanded
+                    ? "bg-[#0F172A] translate-y-1 rotate-45"
+                    : "bg-[#FACC15]"
+                }`}
+              />
+              <span
+                className={`block h-0.5 w-full rounded-full transition-transform duration-200 ${
+                  navExpanded
+                    ? "bg-[#0F172A] -translate-y-1 -rotate-45"
+                    : "bg-white"
+                }`}
+              />
+            </span>
           </button>
         </div>
       </div>
 
-      {/* Full-Screen Minimal Typographic Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-white/98 backdrop-blur-xl border-t border-[#BAE6FD] flex flex-col justify-between p-6 sm:p-10 overflow-y-auto">
-          <nav
-            aria-label="Mobile Navigation"
-            className="flex flex-col divide-y divide-slate-100"
+      {/* Expandable Frosted-Glass Navigation Pill / Drawer */}
+      <AnimatePresence>
+        {navExpanded && (
+          <motion.div
+            initial={{ opacity: 0, y: -12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.97 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="pointer-events-auto max-w-4xl mx-auto mt-3 px-4 sm:px-6"
           >
-            {navLinks.map((item, idx) => (
-              <a
-                key={item.id}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-4 flex items-baseline justify-between group"
+            <div className="rounded-3xl backdrop-blur-xl bg-slate-950/80 border border-white/15 shadow-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <nav
+                aria-label="Primary Navigation"
+                className="flex flex-col md:flex-row md:items-center gap-1 sm:gap-2"
               >
-                <div className="flex items-baseline gap-4">
-                  <span className="font-mono text-xs font-bold text-[#0284C7]">
-                    0{idx + 1}
-                  </span>
-                  <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0F172A] group-hover:text-[#0284C7] transition-colors">
-                    {item.label}
-                  </span>
-                </div>
-                <span className="font-mono text-xs font-bold text-[#475569]">
-                  →
-                </span>
-              </a>
-            ))}
-          </nav>
+                {navLinks.map((item, idx) => {
+                  const isActive = activeSection === item.id;
+                  return (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setNavExpanded(false)}
+                      className={`px-4 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-colors flex items-center justify-between md:justify-start gap-2 ${
+                        isActive
+                          ? "bg-[#0284C7] text-white"
+                          : "text-slate-200 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <span className="font-mono text-[10px] text-[#FACC15] md:hidden">
+                        0{idx + 1}
+                      </span>
+                      <span>{item.label}</span>
+                    </a>
+                  );
+                })}
+              </nav>
 
-          <div className="pt-6 border-t border-[#BAE6FD] space-y-3">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenBooking();
-              }}
-              className="w-full py-4 px-6 rounded-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-sm uppercase tracking-wider transition-colors cursor-pointer"
-            >
-              {t.nav.bookService}
-            </button>
-
-            <div className="flex items-center justify-between text-xs font-bold text-[#475569] pt-2">
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="underline hover:text-[#0284C7]"
+              <button
+                type="button"
+                onClick={() => {
+                  setNavExpanded(false);
+                  onOpenBooking();
+                }}
+                className="px-6 py-2.5 rounded-full bg-[#FACC15] hover:bg-[#EAB308] text-[#0F172A] font-extrabold text-xs uppercase tracking-wider transition-colors cursor-pointer shrink-0"
               >
-                {t.nav.staffPortal} (/login)
-              </Link>
-              <span className="font-mono">092-420-0043</span>
+                {t.nav.bookService}
+              </button>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValueEvent, type MotionValue } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import type { BrandId, PanelStyle } from "@/lib/brands";
 import { BrandLogo } from "@/components/BrandLogos";
@@ -13,6 +13,8 @@ export interface InteractiveAirconRigProps {
   psi?: number;
   panel?: PanelStyle;
   louver?: string;
+  /** Scroll-driven explode progress (0 = Assembled, 1 = Fully Scattered/Exploded) */
+  scrollExplodeProgress?: MotionValue<number>;
 }
 
 function renderFasciaSurface(panel: PanelStyle = "smooth") {
@@ -106,13 +108,28 @@ export function InteractiveAirconRig({
   psi = 135,
   panel = "smooth",
   louver = "dual-flap",
+  scrollExplodeProgress,
 }: InteractiveAirconRigProps) {
   const { language } = useLanguage();
 
-  // 0 = Fully Exploded (5 layers separated), 100 = Fully Assembled
-  const [assemblyPct, setAssemblyPct] = useState<number>(15);
+  // Starts at 100% Assembled, then scatters to 0% Assembled (100% Exploded) as user scrolls into #brands
+  const [assemblyPct, setAssemblyPct] = useState<number>(100);
 
-  // Convert 0..100 into explosion spread factor (1.0 when exploded, 0.0 when assembled)
+  useMotionValueEvent(
+    scrollExplodeProgress ?? {
+      get: () => 0,
+      on: () => () => {},
+    } as unknown as MotionValue<number>,
+    "change",
+    (latestExplode) => {
+      if (!scrollExplodeProgress) return;
+      const clampedExplode = Math.max(0, Math.min(1, latestExplode));
+      const nextAssemblyPct = Math.round((1 - clampedExplode) * 100);
+      setAssemblyPct(nextAssemblyPct);
+    }
+  );
+
+  // Convert 0..100 into explosion spread factor (1.0 when scattered/exploded, 0.0 when assembled)
   const spread = (100 - assemblyPct) / 100;
   const isExploded = assemblyPct < 50;
 
@@ -160,8 +177,8 @@ export function InteractiveAirconRig({
             scale: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
             opacity: { duration: 0.3 },
             y: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
-            rotateX: { duration: 0.35 },
-            rotateY: { duration: 0.35 },
+            rotateX: { duration: 0.25 },
+            rotateY: { duration: 0.25 },
           }}
           style={{
             transformStyle: "preserve-3d",
@@ -176,7 +193,7 @@ export function InteractiveAirconRig({
               z: -90 * spread,
               rotateX: -8 * spread,
             }}
-            transition={{ type: "spring", stiffness: 120, damping: 22 }}
+            transition={{ type: "spring", stiffness: 130, damping: 24 }}
             className="absolute w-[88%] sm:w-[400px] h-[92px] rounded-2xl bg-[#0F172A] border border-slate-600/90 shadow-xl flex flex-col justify-between p-3"
           >
             <div className="flex items-center justify-between font-mono text-[10px] text-slate-400">
@@ -199,7 +216,7 @@ export function InteractiveAirconRig({
               y: 48 * spread,
               z: -42 * spread,
             }}
-            transition={{ type: "spring", stiffness: 120, damping: 22 }}
+            transition={{ type: "spring", stiffness: 130, damping: 24 }}
             className="absolute w-[84%] sm:w-[380px] h-[68px] rounded-xl bg-slate-900/95 border border-[#38BDF8]/55 shadow-lg flex items-center justify-between px-3.5"
           >
             <span className="font-mono text-[10px] font-bold text-[#E0F2FE]">
@@ -228,7 +245,7 @@ export function InteractiveAirconRig({
                   ? "0 0 32px rgba(2, 132, 199, 0.55)"
                   : "0 0 12px rgba(2, 132, 199, 0.2)",
             }}
-            transition={{ type: "spring", stiffness: 120, damping: 22 }}
+            transition={{ type: "spring", stiffness: 130, damping: 24 }}
             className="absolute w-[90%] sm:w-[410px] h-[88px] rounded-2xl bg-[#0369A1] border-2 border-[#38BDF8] flex flex-col justify-between p-3 overflow-hidden"
           >
             <div className="relative z-10 flex items-center justify-between font-mono text-[10px] font-extrabold text-white">
@@ -255,7 +272,7 @@ export function InteractiveAirconRig({
               z: 45 * spread,
               rotateX: 14 * spread,
             }}
-            transition={{ type: "spring", stiffness: 120, damping: 22 }}
+            transition={{ type: "spring", stiffness: 130, damping: 24 }}
             className="absolute w-[88%] sm:w-[396px] h-[74px] rounded-xl bg-[#E0F2FE]/15 backdrop-blur-xs border border-[#BAE6FD]/80 grid grid-cols-2 gap-2.5 p-2.5"
           >
             {[0, 1].map((pane) => (
@@ -280,7 +297,7 @@ export function InteractiveAirconRig({
               z: 95 * spread,
               rotateX: 9 * spread,
             }}
-            transition={{ type: "spring", stiffness: 120, damping: 22 }}
+            transition={{ type: "spring", stiffness: 130, damping: 24 }}
             style={{ borderColor: selectedBrandColor }}
             className="absolute w-[94%] sm:w-[428px] rounded-2xl bg-white text-[#0F172A] border-2 shadow-2xl p-3.5"
           >
@@ -342,7 +359,8 @@ export function InteractiveAirconRig({
           </div>
 
           <span className="font-mono text-xs font-extrabold text-[#FACC15] tabular-nums">
-            {assemblyPct}% {language === "en" ? "ASSEMBLED" : "ประกอบแล้ว"}
+            {100 - assemblyPct}%{" "}
+            {language === "en" ? "SCATTERED" : "ถอดแยกชิ้นส่วน"}
           </span>
         </div>
 
@@ -366,7 +384,7 @@ export function InteractiveAirconRig({
               {language === "en" ? "0% EXPLODED LAYERS" : "0% ถอดแยก 5 ชั้น"}
             </span>
             <span>
-              {language === "en" ? "DRAG TO INSPECT" : "เลื่อนเพื่อดูโครงสร้าง"}
+              {language === "en" ? "SCROLL OR DRAG" : "เลื่อนหน้าจอหรือลากแถบ"}
             </span>
             <span>
               {language === "en" ? "100% FACTORY SEALED" : "100% ประกอบสมบูรณ์"}
@@ -377,4 +395,3 @@ export function InteractiveAirconRig({
     </div>
   );
 }
-
