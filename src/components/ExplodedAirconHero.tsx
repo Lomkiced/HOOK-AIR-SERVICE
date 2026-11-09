@@ -9,6 +9,7 @@ import { SmoothScrollVideo } from "@/components/SmoothScrollVideo";
 interface ExplodedAirconHeroProps {
   activeBrand?: BrandId;
   onOpenBooking: () => void;
+  onPreloadProgress?: (loadedPct: number) => void;
 }
 
 const HERO_VIDEO_SOURCES = [
@@ -25,7 +26,10 @@ const HERO_WORDS = {
   th: ["ถอดลึกทุกชิ้นส่วน", "ฉีดล้างแรงดันสูง", "ประกอบปราณีต", "ความเย็นบริสุทธิ์"],
 } as const;
 
-export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
+export function ExplodedAirconHero({
+  onOpenBooking,
+  onPreloadProgress,
+}: ExplodedAirconHeroProps) {
   const { language } = useLanguage();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -86,6 +90,7 @@ export function ExplodedAirconHero({ onOpenBooking }: ExplodedAirconHeroProps) {
           frameSequence={HERO_FRAME_SEQUENCE}
           scrollYProgress={scrollYProgress}
           dampingLambda={18}
+          onPreloadProgress={onPreloadProgress}
           className="pointer-events-none absolute inset-0 w-full h-full"
         />
 

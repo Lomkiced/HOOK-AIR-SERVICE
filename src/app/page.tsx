@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import type { BrandId } from "@/lib/brands";
 import { Navbar } from "@/components/Navbar";
+import { MapDispatchLoader } from "@/components/MapDispatchLoader";
 import { ExplodedAirconHero } from "@/components/ExplodedAirconHero";
 import { AboutUsWalkthrough } from "@/components/AboutUsWalkthrough";
 import { BrandMasteryShowcase } from "@/components/BrandMasteryShowcase";
@@ -45,6 +46,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#0F172A]">
+      {/* 00. Minimalist Camera-Tracking 3-Wheeled Vehicle Dispatch Loader */}
+      <MapDispatchLoader />
+
       {/* 0. Executive Minimalist Navbar */}
       <Navbar
         onOpenBooking={() => openBookingModal("condo", 2, "sukhumvit", "instant")}

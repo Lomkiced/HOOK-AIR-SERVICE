@@ -28,22 +28,20 @@ export default function StaffLoginPage() {
           <button
             type="button"
             onClick={() => setLanguage("en")}
-            className={`px-3 py-1 rounded-full text-xs font-extrabold tracking-wider cursor-pointer ${
-              language === "en"
+            className={`px-3 py-1 rounded-full text-xs font-extrabold tracking-wider cursor-pointer ${language === "en"
                 ? "bg-[#FACC15] text-[#0F172A]"
                 : "text-[#475569]"
-            }`}
+              }`}
           >
             EN
           </button>
           <button
             type="button"
             onClick={() => setLanguage("th")}
-            className={`px-3 py-1 rounded-full text-xs font-extrabold tracking-wider cursor-pointer ${
-              language === "th"
+            className={`px-3 py-1 rounded-full text-xs font-extrabold tracking-wider cursor-pointer ${language === "th"
                 ? "bg-[#FACC15] text-[#0F172A]"
                 : "text-[#475569]"
-            }`}
+              }`}
           >
             TH
           </button>

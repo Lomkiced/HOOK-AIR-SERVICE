@@ -26,6 +26,8 @@ export interface SmoothScrollVideoProps {
   /** Optional callback invoked ONLY when discrete stage index changes */
   stageThresholds?: number[];
   onStageChange?: (stageIndex: number) => void;
+  /** Optional callback reporting initial frame sequence preload percentage (0..100) */
+  onPreloadProgress?: (loadedPct: number) => void;
   /** Optional DOM refs updated directly inside rAF to avoid React state re-renders */
   progressFillRef?: React.RefObject<HTMLDivElement | null>;
 }
@@ -46,6 +48,7 @@ export function SmoothScrollVideo({
   className = "absolute inset-0 w-full h-full",
   stageThresholds,
   onStageChange,
+  onPreloadProgress,
   progressFillRef,
 }: SmoothScrollVideoProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -63,6 +66,7 @@ export function SmoothScrollVideo({
   const lastStageRef = useRef<number>(-1);
   const onStageChangeRef = useRef(onStageChange);
   const stageThresholdsRef = useRef(stageThresholds);
+  const onPreloadProgressRef = useRef(onPreloadProgress);
 
   const drawCoverSource = useCallback(
     (
@@ -197,7 +201,9 @@ export function SmoothScrollVideo({
     }
 
     let cursor = 0;
-    const CONCURRENCY = 8;
+    let loadedCount = 0;
+    const criticalFrameTarget = Math.min(36, total);
+    const CONCURRENCY = 4;
 
     const loadNext = () => {
       if (isCancelled || cursor >= order.length) return;
@@ -209,31 +215,51 @@ export function SmoothScrollVideo({
 
       img.onload = () => {
         if (isCancelled) return;
-        framesBankRef.current[frameIdx] = img;
-        loadedFlagsRef.current[frameIdx] = true;
+        const commitFrame = () => {
+          if (isCancelled) return;
+          framesBankRef.current[frameIdx] = img;
+          loadedFlagsRef.current[frameIdx] = true;
+          loadedCount++;
 
-        // Paint Frame 0 immediately the instant the first frame finishes loading
-        if (!hasAnyFrameLoadedRef.current) {
-          hasAnyFrameLoadedRef.current = true;
-          const canvas = canvasRef.current;
-          const ctx = canvas ? canvas.getContext("2d", { alpha: false }) : null;
-          if (ctx) {
-            drawCoverSource(
-              ctx,
-              img,
-              img.naturalWidth || 1280,
-              img.naturalHeight || 720,
-              canvasCssSizeRef.current.w,
-              canvasCssSizeRef.current.h
-            );
-            lastPaintedFrameIdxRef.current = frameIdx;
+          if (loadedCount <= criticalFrameTarget && onPreloadProgressRef.current) {
+            const pct = Math.min(100, Math.round((loadedCount / criticalFrameTarget) * 100));
+            onPreloadProgressRef.current(pct);
           }
+
+          // Paint Frame 0 immediately the instant the first frame finishes loading
+          if (!hasAnyFrameLoadedRef.current) {
+            hasAnyFrameLoadedRef.current = true;
+            const canvas = canvasRef.current;
+            const ctx = canvas ? canvas.getContext("2d", { alpha: false }) : null;
+            if (ctx) {
+              drawCoverSource(
+                ctx,
+                img,
+                img.naturalWidth || 1280,
+                img.naturalHeight || 720,
+                canvasCssSizeRef.current.w,
+                canvasCssSizeRef.current.h
+              );
+              lastPaintedFrameIdxRef.current = frameIdx;
+            }
+          }
+          loadNext();
+        };
+
+        if (typeof img.decode === "function") {
+          img.decode().then(commitFrame).catch(commitFrame);
+        } else {
+          commitFrame();
         }
-        loadNext();
       };
 
       img.onerror = () => {
         if (isCancelled) return;
+        loadedCount++;
+        if (loadedCount <= criticalFrameTarget && onPreloadProgressRef.current) {
+          const pct = Math.min(100, Math.round((loadedCount / criticalFrameTarget) * 100));
+          onPreloadProgressRef.current(pct);
+        }
         loadNext();
       };
     };
@@ -250,7 +276,8 @@ export function SmoothScrollVideo({
   useEffect(() => {
     onStageChangeRef.current = onStageChange;
     stageThresholdsRef.current = stageThresholds;
-  }, [onStageChange, stageThresholds]);
+    onPreloadProgressRef.current = onPreloadProgress;
+  }, [onStageChange, stageThresholds, onPreloadProgress]);
 
   // 2. Decoupled 60/120FPS requestAnimationFrame Loop (Crisp Single-Frame Paint, Zero Blur)
   useEffect(() => {
@@ -273,6 +300,24 @@ export function SmoothScrollVideo({
 
       if (Math.abs(rawProgress - smoothedProgress) < 0.0004) {
         smoothedProgress = rawProgress;
+      }
+
+      // Primary Fast Early-Out when scroll is stationary and target frame is already painted
+      if (
+        hasAnyFrameLoadedRef.current &&
+        framesBankRef.current.length > 0 &&
+        smoothedProgress === rawProgress
+      ) {
+        const stationaryIdx = Math.round(
+          smoothedProgress * (framesBankRef.current.length - 1)
+        );
+        if (
+          stationaryIdx === lastPaintedFrameIdxRef.current &&
+          loadedFlagsRef.current[stationaryIdx]
+        ) {
+          rafId = window.requestAnimationFrame(tick);
+          return;
+        }
       }
 
       if (progressFillRef?.current) {
