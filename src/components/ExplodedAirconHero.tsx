@@ -88,6 +88,7 @@ export function ExplodedAirconHero({
         <SmoothScrollVideo
           sources={HERO_VIDEO_SOURCES}
           frameSequence={HERO_FRAME_SEQUENCE}
+          priority={true}
           scrollYProgress={scrollYProgress}
           dampingLambda={18}
           onPreloadProgress={onPreloadProgress}

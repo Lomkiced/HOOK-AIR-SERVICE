@@ -84,6 +84,7 @@ export function AboutUsWalkthrough() {
               <SmoothScrollVideo
                 sources={FPOV_VIDEO_SOURCES}
                 frameSequence={FPOV_FRAME_SEQUENCE}
+                priority={false}
                 scrollYProgress={scrollYProgress}
                 dampingLambda={18}
                 stageThresholds={FPOV_STAGE_THRESHOLDS}

@@ -22,8 +22,8 @@ export function MapDispatchLoader({
   const worldGroupRef = useRef<SVGGElement | null>(null);
   const trikeGroupRef = useRef<SVGGElement | null>(null);
   const navGlowOuterRef = useRef<SVGPathElement | null>(null);
-  const navGlowCoreRef = useRef<SVGPathElement | null>(null);
-  const progressTextRef = useRef<HTMLSpanElement | null>(null);
+  const activeRouteRef = useRef<SVGPathElement | null>(null);
+  const percentTextRef = useRef<HTMLSpanElement | null>(null);
   const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
@@ -40,8 +40,8 @@ export function MapDispatchLoader({
     if (navGlowOuterRef.current) {
       navGlowOuterRef.current.style.strokeDasharray = `${totalLen}`;
     }
-    if (navGlowCoreRef.current) {
-      navGlowCoreRef.current.style.strokeDasharray = `${totalLen}`;
+    if (activeRouteRef.current) {
+      activeRouteRef.current.style.strokeDasharray = `${totalLen}`;
     }
 
     let lastDisplayedPct = -1;
@@ -83,14 +83,14 @@ export function MapDispatchLoader({
       if (navGlowOuterRef.current) {
         navGlowOuterRef.current.style.strokeDashoffset = dashOffset;
       }
-      if (navGlowCoreRef.current) {
-        navGlowCoreRef.current.style.strokeDashoffset = dashOffset;
+      if (activeRouteRef.current) {
+        activeRouteRef.current.style.strokeDashoffset = dashOffset;
       }
 
       const roundedPct = Math.round(clampedT * 100);
-      if (roundedPct !== lastDisplayedPct && progressTextRef.current) {
+      if (roundedPct !== lastDisplayedPct && percentTextRef.current) {
         lastDisplayedPct = roundedPct;
-        progressTextRef.current.textContent = `${roundedPct}%`;
+        percentTextRef.current.textContent = `${roundedPct}%`;
       }
     };
 
@@ -282,7 +282,7 @@ export function MapDispatchLoader({
                   strokeLinejoin="round"
                 />
                 <path
-                  ref={navGlowCoreRef}
+                  ref={activeRouteRef}
                   d={WORLD_ROUTE}
                   stroke="#38bdf8"
                   strokeWidth="6"
@@ -407,7 +407,7 @@ export function MapDispatchLoader({
 
           {/* Whisper-quiet numeric progress only (Zero words) */}
           <span
-            ref={progressTextRef}
+            ref={percentTextRef}
             className="mt-2 font-mono text-xs font-medium tracking-widest text-slate-500 tabular-nums"
           >
             0%

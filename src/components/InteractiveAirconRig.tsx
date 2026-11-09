@@ -105,7 +105,7 @@ function renderFasciaSurface(panel: PanelStyle = "smooth") {
   );
 }
 
-export function InteractiveAirconRig({
+export const InteractiveAirconRig = React.memo(function InteractiveAirconRig({
   selectedBrandId = "daikin",
   selectedBrandName,
   selectedBrandColor = "#0284C7",
@@ -155,19 +155,17 @@ export function InteractiveAirconRig({
         className="pointer-events-none absolute w-[380px] sm:w-[460px] h-[380px] sm:h-[460px] rounded-full bg-[radial-gradient(circle,rgba(2,132,199,0.16)_0%,rgba(186,230,253,0.08)_45%,transparent_72%)] blur-2xl"
       />
 
-      {/* Free-Floating 3D 5-Layer Air-Conditioner Assembly */}
+      {/* Free-Floating 3D 5-Layer Air-Conditioner Assembly (Zero Infinite Loop GPU Drain) */}
       <motion.div
         key={selectedBrandName}
-        initial={{ scale: 0.94, opacity: 0.75 }}
+        initial={{ scale: 0.96, opacity: 0.85 }}
         animate={{
           scale: 1,
           opacity: 1,
-          y: [0, -7, 0],
         }}
         transition={{
-          scale: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
-          opacity: { duration: 0.3 },
-          y: { duration: 4.8, repeat: Infinity, ease: "easeInOut" },
+          scale: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.25 },
         }}
         style={{
           rotateX: rigRotX,
@@ -203,7 +201,7 @@ export function InteractiveAirconRig({
             className="hidden sm:flex items-center gap-2 absolute -right-44 top-1/2 -translate-y-1/2 pointer-events-none"
           >
             <span className="w-6 h-px bg-[#0284C7]" />
-            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-left">
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-[#0284C7]/40 shadow-lg text-left">
               <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
                 05 / DRAIN TROUGH
               </div>
@@ -241,7 +239,7 @@ export function InteractiveAirconRig({
             style={{ opacity: calloutOpacity, x: calloutLeftX }}
             className="hidden sm:flex items-center gap-2 absolute -left-48 top-1/2 -translate-y-1/2 pointer-events-none"
           >
-            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-right">
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-[#0284C7]/40 shadow-lg text-right">
               <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
                 04 / BLOWER WHEEL
               </div>
@@ -298,7 +296,7 @@ export function InteractiveAirconRig({
         ==================================================================== */}
         <motion.div
           style={{ y: l2Y, z: l2Z, rotateX: l2RotX, willChange: "transform" }}
-          className="absolute w-[84%] sm:w-[338px] h-[68px] rounded-xl bg-white/85 backdrop-blur-md border-2 border-[#0284C7]/60 shadow-lg grid grid-cols-2 gap-2 p-2"
+          className="absolute w-[84%] sm:w-[338px] h-[68px] rounded-xl bg-white/95 border-2 border-[#0284C7]/60 shadow-lg grid grid-cols-2 gap-2 p-2"
         >
           {[0, 1].map((pane) => (
             <div
@@ -319,7 +317,7 @@ export function InteractiveAirconRig({
             style={{ opacity: calloutOpacity, x: calloutLeftX }}
             className="hidden sm:flex items-center gap-2 absolute -left-48 top-1/2 -translate-y-1/2 pointer-events-none"
           >
-            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-right">
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-[#0284C7]/40 shadow-lg text-right">
               <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
                 02 / HONEYCOMB MESH
               </div>
@@ -369,7 +367,7 @@ export function InteractiveAirconRig({
             className="hidden sm:flex items-center gap-2 absolute -right-44 top-1/2 -translate-y-1/2 pointer-events-none"
           >
             <span className="w-6 h-px bg-[#0284C7]" />
-            <div className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-[#0284C7]/40 shadow-lg text-left">
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-[#0284C7]/40 shadow-lg text-left">
               <div className="font-mono text-[9px] font-extrabold text-[#0284C7] uppercase">
                 01 / FRONT FASCIA
               </div>
@@ -382,4 +380,4 @@ export function InteractiveAirconRig({
       </motion.div>
     </div>
   );
-}
+});
